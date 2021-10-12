@@ -30,7 +30,6 @@
 
 # Executables
 *.exe
-*.out
 *.app
 *.i*86
 *.x86_64
@@ -50,3 +49,21 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# syntax
+syntax.tab.c
+syntax.tab.h
+syntax.output
+
+# flex
+lex.yy.c
+
+# bin
+/bin/
+
+.vscode/
+
+# test result
+/test-self/*.out
+
+temp*
