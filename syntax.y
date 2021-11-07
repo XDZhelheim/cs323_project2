@@ -3,7 +3,7 @@
     #include <string.h>
     #define YYSTYPE TreeNode *
     extern "C" {
-        #include "TreeNode.hpp"
+        #include "NodeAnalyser.hpp"
     }
     void yyerror(const char*);
 %}
