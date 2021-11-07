@@ -2,6 +2,12 @@
 #define NODE_ANALYSER_HPP
 
 #include "TreeNode.hpp"
+#include "type.hpp"
+#include <map>
+
+using std::map;
+
+map<string, Type*> symbolTable;
 
 class Analyser
 {
@@ -19,9 +25,11 @@ public:
     void analyze()
     {
     }
+
+    
 };
 
-void AnalysisTreeNode(char *file_path)
+void analysisTreeNode(char *file_path)
 {
     string path = file_path;
     string out_path = "/dev/stdout";

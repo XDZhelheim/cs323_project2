@@ -1,24 +1,44 @@
-typedef struct Type {
-    char name[32];
-    enum { PRIMITIVE,
-           ARRAY,
-           STRUCTURE } category;
+#ifndef TYPE_HPP
+#define TYPE_HPP
+
+enum Category {
+    PRIMITIVE,
+    ARRAY,
+    STRUCTURE
+};
+
+enum Primitive {
+    INT,
+    FLOAT,
+    CHAR
+};
+
+class Type {
+public:
+    string name;
+    Category category;
     union {
-        enum { INT,
-               FLOAT,
-               CHAR } primitive;
-        struct Array* array;
-        struct FieldList* structure;
+        Primitive primitive;
+        Array* array;
+        FieldList* structure;
     };
-} Type;
+};
 
-typedef struct Array {
-    struct Type* base;
+class Array {
+public:
+    Type* base;
     int size;
-} Array;
 
-typedef struct FieldList {
-    char name[32];
-    struct Type* type;
-    struct FieldList* next;
-} FieldList;
+    Array(Type* base, int size);
+};
+
+class FieldList {
+public:
+    string name;
+    Type* type;
+    FieldList* next;
+
+    FieldList(string name, Type *type, FieldList *next);
+};
+
+#endif
