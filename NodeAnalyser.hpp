@@ -7,7 +7,7 @@
 
 using std::map;
 
-map<string, Type*> symbolTable;
+map<string, Type *> symbolTable;
 
 class Analyser
 {
@@ -22,7 +22,8 @@ public:
         out = ofstream(path);
     }
 
-    void analyze() {
+    void analyze()
+    {
         analyzeProgram(root);
     }
 
@@ -30,7 +31,7 @@ public:
     Program: 
       ExtDefList 
     */
-    void analyzeProgram(TreeNode* node)
+    void analyzeProgram(TreeNode *node)
     {
         analyzeExtDefList(node->child[0]);
     }
@@ -40,11 +41,14 @@ public:
       ExtDef ExtDefList
     | %empty
     */
-    void analyzeExtDefList(TreeNode* node) {
-        if (node->child.empty()) { // empty
+    void analyzeExtDefList(TreeNode *node)
+    {
+        if (node->child.empty())
+        { // empty
             return;
         }
-        else { // ExtDef ExtDefList
+        else
+        { // ExtDef ExtDefList
             analyzeExtDef(node->child[0]);
             analyzeExtDefList(node->child[1]);
         }
@@ -59,15 +63,19 @@ public:
       TYPE
     | StructSpecifier
     */
-    void analyzeExtDef(TreeNode* node) {
-        if (node->child.size()==2) { // Specifier SEMI
+    void analyzeExtDef(TreeNode *node)
+    {
+        if (node->child.size() == 2)
+        { // Specifier SEMI
             analyzeSpecifier(node->child[0]);
         }
-        else if (node->child[2]->child.empty()) { // Specifier ExtDecList SEMI
+        else if (node->child[2]->child.empty())
+        { // Specifier ExtDecList SEMI
             analyzeSpecifier(node->child[0]);
             analyzeExtDecList(node->child[1]);
         }
-        else { // Specifier FunDec CompSt
+        else
+        { // Specifier FunDec CompSt
             analyzeSpecifier(node->child[0]);
             analyzeFunDec(node->child[1]);
             analyzeCompSt(node->child[2]);
@@ -79,11 +87,14 @@ public:
       VarDec
     | VarDec COMMA ExtDecList
     */
-    void analyzeExtDecList(TreeNode* node) {
-        if (node->child.size()==1) { // VarDec
+    void analyzeExtDecList(TreeNode *node)
+    {
+        if (node->child.size() == 1)
+        { // VarDec
             analyzeVarDec(node->child[0]);
         }
-        else { // VarDec COMMA ExtDecList
+        else
+        { // VarDec COMMA ExtDecList
             analyzeVarDec(node->child[0]);
             analyzeExtDecList(node->child[2]);
         }
@@ -94,11 +105,14 @@ public:
       TYPE
     | StructSpecifier
     */
-    void analyzeSpecifier(TreeNode* node) {
-        if (node->child[0]->child.empty()) { // TYPE
+    void analyzeSpecifier(TreeNode *node)
+    {
+        if (node->child[0]->child.empty())
+        { // TYPE
             // TODO type
         }
-        else { // StructSpecifier
+        else
+        { // StructSpecifier
             analyzeStructSpecifier(node->child[0]);
         }
     }
@@ -108,9 +122,11 @@ public:
       STRUCT ID LC DefList RC
     | STRUCT ID
     */
-    void analyzeStructSpecifier(TreeNode* node) {
+    void analyzeStructSpecifier(TreeNode *node)
+    {
         // TODO ID
-        if (node->child.size()==5) { // STRUCT ID LC DefList RC
+        if (node->child.size() == 5)
+        { // STRUCT ID LC DefList RC
             analyzeDefList(node->child[3]);
         }
     }
@@ -120,11 +136,14 @@ public:
       ID
     | VarDec LB INT RB
     */
-    void analyzeVarDec(TreeNode* node) {
-        if (node->child.size()==1) { // ID
+    void analyzeVarDec(TreeNode *node)
+    {
+        if (node->child.size() == 1)
+        { // ID
             // TODO ID
         }
-        else { // VarDec LB INT RB 
+        else
+        { // VarDec LB INT RB
             analyzeVarDec(node->child[0]);
             // TODO [index]
         }
@@ -135,9 +154,11 @@ public:
       ID LP VarList RP
     | ID LP RP
     */
-    void analyzeFunDec(TreeNode* node) {
+    void analyzeFunDec(TreeNode *node)
+    {
         // TODO ID
-        if (node->child.size()==4) { // ID LP VarList RP
+        if (node->child.size() == 4)
+        { // ID LP VarList RP
             analyzeVarList(node->child[2]);
         }
     }
@@ -147,9 +168,11 @@ public:
       ParamDec COMMA VarList
     | ParamDec
     */
-    void analyzeVarList(TreeNode* node) {
+    void analyzeVarList(TreeNode *node)
+    {
         analyzeParamDec(node->child[0]);
-        if (node->child.size()==3) { // ParamDec COMMA VarList
+        if (node->child.size() == 3)
+        { // ParamDec COMMA VarList
             analyzeVarList(node->child[2]);
         }
     }
@@ -158,7 +181,8 @@ public:
     ParamDec: 
       Specifier VarDec
     */
-    void analyzeParamDec(TreeNode* node) {
+    void analyzeParamDec(TreeNode *node)
+    {
         analyzeSpecifier(node->child[0]);
         analyzeVarDec(node->child[1]);
     }
@@ -167,7 +191,8 @@ public:
     CompSt: 
       LC DefList StmtList RC
     */
-    void analyzeCompSt(TreeNode* node) {
+    void analyzeCompSt(TreeNode *node)
+    {
         analyzeDefList(node->child[0]);
         analyzeStmtList(node->child[1]);
     }
@@ -177,11 +202,14 @@ public:
       Stmt StmtList
     | %empty
     */
-    void analyzeStmtList(TreeNode* node) {
-        if (node->child.empty()) { // empty
+    void analyzeStmtList(TreeNode *node)
+    {
+        if (node->child.empty())
+        { // empty
             return;
         }
-        else { // Stmt StmtList
+        else
+        { // Stmt StmtList
             analyzeStmt(node->child[0]);
             analyzeStmtList(node->child[1]);
         }
@@ -196,22 +224,28 @@ public:
     | IF LP Exp RP Stmt ELSE Stmt
     | WHILE LP Exp RP Stmt
     */
-    void analyzeStmt(TreeNode* node) {
-        if (node->child.size()==2) { // Exp SEMI
+    void analyzeStmt(TreeNode *node)
+    {
+        if (node->child.size() == 2)
+        { // Exp SEMI
             analyzeExp(node->child[0]);
         }
-        else if (node->child.size()==1) { // CompSt
+        else if (node->child.size() == 1)
+        { // CompSt
             analyzeCompSt(node->child[0]);
         }
-        else if (node->child.size()==3) { // RETURN Exp SEMI
+        else if (node->child.size() == 3)
+        { // RETURN Exp SEMI
             // TODO return
             analyzeExp(node->child[2]);
         }
-        else if (node->child.size()==5) { // IF LP Exp RP Stmt & WHILE LP Exp RP Stmt
+        else if (node->child.size() == 5)
+        { // IF LP Exp RP Stmt & WHILE LP Exp RP Stmt
             analyzeExp(node->child[2]);
             analyzeStmt(node->child[4]);
         }
-        else { // IF LP Exp RP Stmt ELSE Stmt
+        else
+        { // IF LP Exp RP Stmt ELSE Stmt
             analyzeExp(node->child[2]);
             analyzeStmt(node->child[4]);
             analyzeStmt(node->child[6]);
@@ -223,12 +257,15 @@ public:
       Def DefList
     | %empty
     */
-    void analyzeDefList(TreeNode* node) {
-        if (node->child.size()==2) { // Def DefList
+    void analyzeDefList(TreeNode *node)
+    {
+        if (node->child.size() == 2)
+        { // Def DefList
             analyzeDef(node->child[0]);
             analyzeDefList(node->child[1]);
         }
-        else { // empty
+        else
+        { // empty
             return;
         }
     }
@@ -237,7 +274,8 @@ public:
     Def: 
       Specifier DecList SEMI 
     */
-    void analyzeDef(TreeNode* node) {
+    void analyzeDef(TreeNode *node)
+    {
         analyzeSpecifier(node->child[0]);
         analyzeDecList(node->child[1]);
     }
@@ -247,9 +285,11 @@ public:
       Dec
     | Dec COMMA DecList
     */
-    void analyzeDecList(TreeNode* node) {
+    void analyzeDecList(TreeNode *node)
+    {
         analyzeDec(node->child[0]);
-        if (node->child.size()==3) { // Dec COMMA DecList
+        if (node->child.size() == 3)
+        { // Dec COMMA DecList
             analyzeDecList(node->child[2]);
         }
     }
@@ -259,9 +299,11 @@ public:
       VarDec
     | VarDec ASSIGN Exp
     */
-    void analyzeDec(TreeNode* node) {
+    void analyzeDec(TreeNode *node)
+    {
         analyzeVarDec(node->child[0]);
-        if (node->child.size()==3) { // VarDec ASSIGN Exp
+        if (node->child.size() == 3)
+        { // VarDec ASSIGN Exp
             // TODO type check
             analyzeExp(node->child[2]);
         }
@@ -294,35 +336,46 @@ public:
     | FLOAT
     | CHAR
     */
-    void analyzeExp(TreeNode* node) {
-        if (node->child.size()==3) { // yidadui
-            if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty()) { // ID LP RP
+    void analyzeExp(TreeNode *node)
+    {
+        if (node->child.size() == 3)
+        { // yidadui
+            if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
+            { // ID LP RP
                 return;
             }
-            else if (node->child[0]->child.empty() && !node->child[1]->child.empty() && node->child[2]->child.empty()) { // LP Exp RP
+            else if (node->child[0]->child.empty() && !node->child[1]->child.empty() && node->child[2]->child.empty())
+            { // LP Exp RP
                 analyzeExp(node->child[1]);
             }
-            else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty()) { // Exp DOT ID
+            else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
+            { // Exp DOT ID
                 analyzeExp(node->child[0]);
             }
-            else {
+            else
+            {
                 analyzeExp(node->child[0]);
                 analyzeExp(node->child[2]);
             }
         }
-        else if (node->child.size()==2) {
+        else if (node->child.size() == 2)
+        {
             analyzeExp(node->child[1]);
         }
-        else if (node->child.size()==4) {
-            if (node->child[0]->child.empty()) { // ID LP Args RP
+        else if (node->child.size() == 4)
+        {
+            if (node->child[0]->child.empty())
+            { // ID LP Args RP
                 analyzeArgs(node->child[2]);
             }
-            else { // Exp LB Exp RB
+            else
+            { // Exp LB Exp RB
                 analyzeExp(node->child[0]);
                 analyzeExp(node->child[2]);
             }
         }
-        else {
+        else
+        {
             // TODO ID INT FLOAT CHAR
         }
     }
@@ -332,13 +385,14 @@ public:
       Exp COMMA Args
     | Exp
     */
-    void analyzeArgs(TreeNode* node) {
+    void analyzeArgs(TreeNode *node)
+    {
         analyzeExp(node->child[0]);
-        if (node->child.size()==3) { // Exp COMMA Args
+        if (node->child.size() == 3)
+        { // Exp COMMA Args
             analyzeArgs(node->child[2]);
         }
     }
-
 };
 
 void analysisTreeNode(char *file_path)
