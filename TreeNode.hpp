@@ -39,7 +39,7 @@ struct TreeNode
 
 struct TreeNode *root;
 
-TreeNode *create_node(string name, int position=0, DataType type = DataType::OTHER, string val = "")
+TreeNode *create_node(string name, int position = 0, DataType type = DataType::OTHER, string val = "")
 {
     TreeNode *node = new TreeNode;
     node->name = name;
@@ -63,70 +63,25 @@ TreeNode *create_child_node(string name, int position, initializer_list<TreeNode
     return node;
 }
 
-class Printer
+class Analyser
 {
 private:
-    TreeNode *root;
+TreeNode *root;
     ofstream out;
 
 public:
-    Printer(TreeNode *node, string path)
+    Analyser(TreeNode *node, string path)
     {
         root = node;
         out = ofstream(path);
     }
 
-    void print()
+    void analyze()
     {
-        recursive_print(root, 0);
-    }
-
-    void recursive_print(TreeNode *node, int depth)
-    {
-        if (node->type == DataType::CHILD && node->child.size() == 0)
-        {
-            return;
-        }
-        for (int i = 0; i < depth; i++)
-        {
-            out << "  ";
-        }
-        if (node->type == DataType::TYPE_TYPE)
-        {
-            out << "TYPE: " << node->data << endl;
-        }
-        else if (node->type == DataType::CHAR_TYPE)
-        {
-            out << "CHAR: " << node->data << endl;
-        }
-        else if (node->type == DataType::INT_TYPE)
-        {
-            out << "INT: " << strtol(node->data.c_str(), NULL, 0) << endl;
-        }
-        else if (node->type == DataType::FLOAT_TYPE)
-        {
-            out << "FLOAT: " << node->data << endl;
-        }
-        else if (node->type == DataType::ID_TYPE)
-        {
-            out << "ID: " << node->data << endl;
-        }
-        else if (node->type == DataType::OTHER)
-        {
-            out << node->name << endl;
-        }
-        else
-        {
-            out << node->name << " (" << node->pos << ")" << endl;
-            for (auto c : node->child)
-            {
-                recursive_print(c, depth + 1);
-            }
-        }
     }
 };
 
-void PrintTreeNode(char *file_path)
+void AnalysisTreeNode(char *file_path)
 {
     string path = file_path;
     string out_path = "/dev/stdout";
@@ -134,7 +89,7 @@ void PrintTreeNode(char *file_path)
     {
         out_path = path.substr(0, path.length() - 4) + ".out";
     }
-    Printer(root, out_path).print();
+    Analyser(root, out_path).analyze();
 }
 
 #endif
