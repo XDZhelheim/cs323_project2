@@ -1,6 +1,8 @@
 #ifndef NODE_ANALYSER_HPP
 #define NODE_ANALYSER_HPP
 
+#include "TreeNode.hpp"
+
 class Analyser
 {
 private:

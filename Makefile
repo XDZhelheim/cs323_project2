@@ -11,6 +11,5 @@ BISON=bison
 splc: .lex .syntax
 	mkdir -p bin && $(CXX) syntax.tab.c -lfl -ly -o bin/splc
 clean:
-	@rm -f lex.yy.c syntax.tab.*
-	@rm -r bin
+	@rm -rf lex.yy.c syntax.tab.* bin syntax.output
 all: splc
