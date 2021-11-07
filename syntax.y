@@ -195,7 +195,7 @@ int main(int argc, char **argv){
         else
         {
             fclose(output_file);
-            AnalysisTreeNode(file_path);
+            analysisTreeNode(file_path);
         }
         return 0;
     } else{

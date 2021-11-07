@@ -20,7 +20,7 @@ public:
     union {
         Primitive primitive;
         Array* array;
-        FieldList* structure;
+        vector<FieldList> structure;
     };
 };
 
@@ -36,9 +36,8 @@ class FieldList {
 public:
     string name;
     Type* type;
-    FieldList* next;
 
-    FieldList(string name, Type *type, FieldList *next);
+    FieldList(string name, Type *type);
 };
 
 #endif
