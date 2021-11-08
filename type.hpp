@@ -10,10 +10,13 @@ enum Category
 
 enum Primitive
 {
-    INT,
-    FLOAT,
-    CHAR
+    INT_VAL,
+    FLOAT_VAL,
+    CHAR_VAL
 };
+
+class Array;
+class FieldList;
 
 class Type
 {

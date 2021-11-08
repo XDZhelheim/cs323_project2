@@ -2,9 +2,7 @@
     #include "lex.yy.c"
     #include <string.h>
     #define YYSTYPE TreeNode *
-    extern "C" {
-        #include "NodeAnalyser.hpp"
-    }
+    #include "NodeAnalyser.hpp"
     void yyerror(const char*);
 %}
 
