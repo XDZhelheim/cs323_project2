@@ -28,7 +28,7 @@ public:
 
     string primitive_value;
 
-    Array array;
+    Array *array;
 
     vector<Type> varlist;
 
@@ -38,7 +38,7 @@ public:
     {
         if (category == Category::ARRAY)
         {
-            return &array.type;
+            return &array->type;
         }
         else
         {

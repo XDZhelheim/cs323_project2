@@ -21,9 +21,6 @@ public:
         out = ofstream(path);
     }
 
-    // TODO Specifier & return 
-    // TODO Exps
-
     void analyze()
     {
         analyzeProgram(root);
@@ -46,12 +43,12 @@ public:
     void analyzeExtDefList(TreeNode *node)
     {
         if (node->child.empty())
-        { 
+        {
             // empty
             return;
         }
         else
-        { 
+        {
             // ExtDef ExtDefList
             analyzeExtDef(node->child[0]);
             analyzeExtDefList(node->child[1]);
@@ -63,29 +60,30 @@ public:
       Specifier ExtDecList SEMI
     | Specifier SEMI
     | Specifier FunDec CompSt
-    Specifier: 
-      TYPE
-    | StructSpecifier
     */
     void analyzeExtDef(TreeNode *node)
     {
         if (node->child.size() == 2)
-        { 
+        {
+            // TODO symbol table
+            analyzeSpecifier(node->child[0]);
             // Specifier SEMI
-            analyzeSpecifier(node->child[0]);
-        }
-        else if (node->child[2]->child.empty())
-        { 
-            // Specifier ExtDecList SEMI
-            analyzeSpecifier(node->child[0]);
-            analyzeExtDecList(node->child[1]);
         }
         else
-        { 
-            // Specifier FunDec CompSt
-            analyzeSpecifier(node->child[0]);
-            analyzeFunDec(node->child[1]);
-            analyzeCompSt(node->child[2]);
+        {
+            Type specifier = analyzeSpecifier(node->child[0]);
+            // TODO check type
+            if (node->child[2]->child.empty())
+            {
+                // Specifier ExtDecList SEMI
+                analyzeExtDecList(node->child[1], specifier);
+            }
+            else
+            {
+                // Specifier FunDec CompSt
+                analyzeFunDec(node->child[1], specifier);
+                analyzeCompSt(node->child[2], specifier);
+            }
         }
     }
 
@@ -94,18 +92,17 @@ public:
       VarDec
     | VarDec COMMA ExtDecList
     */
-    void analyzeExtDecList(TreeNode *node)
+    void analyzeExtDecList(TreeNode *node, Type specifier)
     {
+        analyzeVarDec(node->child[0], specifier);
         if (node->child.size() == 1)
-        { 
+        {
             // VarDec
-            analyzeVarDec(node->child[0]);
         }
         else
-        { 
+        {
             // VarDec COMMA ExtDecList
-            analyzeVarDec(node->child[0]);
-            analyzeExtDecList(node->child[2]);
+            analyzeExtDecList(node->child[2], specifier);
         }
     }
 
@@ -114,17 +111,17 @@ public:
       TYPE
     | StructSpecifier
     */
-    void analyzeSpecifier(TreeNode *node)
+    Type analyzeSpecifier(TreeNode *node)
     {
         if (node->child[0]->child.empty())
-        { 
+        {
             // TYPE
-            // TODO type
+            // TODO check type
         }
         else
-        { 
+        {
             // StructSpecifier
-            analyzeStructSpecifier(node->child[0]);
+            return analyzeStructSpecifier(node->child[0]);
         }
     }
 
@@ -133,13 +130,17 @@ public:
       STRUCT ID LC DefList RC
     | STRUCT ID
     */
-    void analyzeStructSpecifier(TreeNode *node)
+    Type analyzeStructSpecifier(TreeNode *node)
     {
-        // TODO ID
         if (node->child.size() == 5)
-        { 
+        {
+            // TODO symbol table
             // STRUCT ID LC DefList RC
             analyzeDefList(node->child[3]);
+        }
+        else
+        {
+            // TODO check struct
         }
     }
 
@@ -148,17 +149,18 @@ public:
       ID
     | VarDec LB INT RB
     */
-    void analyzeVarDec(TreeNode *node)
+    void analyzeVarDec(TreeNode *node, Type specifier)
     {
         if (node->child.size() == 1)
-        { 
-            // TODO ID
+        {
+            // TODO symbol table
+            // ID
         }
         else
-        { 
+        {
             // VarDec LB INT RB
-            analyzeVarDec(node->child[0]);
-            // TODO [index]
+            // TODO recursive 
+            analyzeVarDec(node->child[0], specifier);
         }
     }
 
@@ -167,13 +169,14 @@ public:
       ID LP VarList RP
     | ID LP RP
     */
-    void analyzeFunDec(TreeNode *node)
+    void analyzeFunDec(TreeNode *node, Type specifier)
     {
-        // TODO ID
+        // TODO symbol table
+        Type func;
         if (node->child.size() == 4)
-        { 
+        {
             // ID LP VarList RP
-            analyzeVarList(node->child[2]);
+            analyzeVarList(node->child[2], func.varlist);
         }
     }
 
@@ -182,13 +185,13 @@ public:
       ParamDec COMMA VarList
     | ParamDec
     */
-    void analyzeVarList(TreeNode *node)
+    void analyzeVarList(TreeNode *node, vector<Type> &args)
     {
-        analyzeParamDec(node->child[0]);
+        analyzeParamDec(node->child[0], args);
         if (node->child.size() == 3)
-        { 
+        {
             // ParamDec COMMA VarList
-            analyzeVarList(node->child[2]);
+            analyzeVarList(node->child[2], args);
         }
     }
 
@@ -196,20 +199,21 @@ public:
     ParamDec: 
       Specifier VarDec
     */
-    void analyzeParamDec(TreeNode *node)
+    void analyzeParamDec(TreeNode *node, vector<Type> &args)
     {
-        analyzeSpecifier(node->child[0]);
-        analyzeVarDec(node->child[1]);
+        Type specifier = analyzeSpecifier(node->child[0]);
+        // TODO recursive
+        analyzeVarDec(node->child[1], specifier);
     }
 
     /*
     CompSt: 
       LC DefList StmtList RC
     */
-    void analyzeCompSt(TreeNode *node)
+    void analyzeCompSt(TreeNode *node, Type specifier)
     {
         analyzeDefList(node->child[0]);
-        analyzeStmtList(node->child[1]);
+        analyzeStmtList(node->child[1], specifier);
     }
 
     /*
@@ -217,18 +221,18 @@ public:
       Stmt StmtList
     | %empty
     */
-    void analyzeStmtList(TreeNode *node)
+    void analyzeStmtList(TreeNode *node, Type specifier)
     {
         if (node->child.empty())
-        { 
+        {
             // empty
             return;
         }
         else
-        { 
+        {
             // Stmt StmtList
-            analyzeStmt(node->child[0]);
-            analyzeStmtList(node->child[1]);
+            analyzeStmt(node->child[0], specifier);
+            analyzeStmtList(node->child[1], specifier);
         }
     }
 
@@ -241,36 +245,36 @@ public:
     | IF LP Exp RP Stmt ELSE Stmt
     | WHILE LP Exp RP Stmt
     */
-    void analyzeStmt(TreeNode *node)
+    void analyzeStmt(TreeNode *node, Type specifier)
     {
         if (node->child.size() == 2)
-        { 
+        {
             // Exp SEMI
             analyzeExp(node->child[0]);
         }
         else if (node->child.size() == 1)
-        { 
+        {
             // CompSt
-            analyzeCompSt(node->child[0]);
+            analyzeCompSt(node->child[0], specifier);
         }
         else if (node->child.size() == 3)
-        { 
+        {
             // RETURN Exp SEMI
-            // TODO return
-            analyzeExp(node->child[2]);
+            Type exp = analyzeExp(node->child[2]);
+            // TODO check type
         }
         else if (node->child.size() == 5)
-        { 
+        {
             // IF LP Exp RP Stmt & WHILE LP Exp RP Stmt
-            analyzeExp(node->child[2]);
-            analyzeStmt(node->child[4]);
+            analyzeExp(node->child[2], 1);
+            analyzeStmt(node->child[4], specifier);
         }
         else
-        { 
+        {
             // IF LP Exp RP Stmt ELSE Stmt
-            analyzeExp(node->child[2]);
-            analyzeStmt(node->child[4]);
-            analyzeStmt(node->child[6]);
+            analyzeExp(node->child[2], 1);
+            analyzeStmt(node->child[4], specifier);
+            analyzeStmt(node->child[6], specifier);
         }
     }
 
@@ -282,13 +286,13 @@ public:
     void analyzeDefList(TreeNode *node)
     {
         if (node->child.size() == 2)
-        { 
+        {
             // Def DefList
             analyzeDef(node->child[0]);
             analyzeDefList(node->child[1]);
         }
         else
-        { 
+        {
             // empty
             return;
         }
@@ -300,8 +304,8 @@ public:
     */
     void analyzeDef(TreeNode *node)
     {
-        analyzeSpecifier(node->child[0]);
-        analyzeDecList(node->child[1]);
+        Type specifier = analyzeSpecifier(node->child[0]);
+        analyzeDecList(node->child[1], specifier);
     }
 
     /*
@@ -309,13 +313,13 @@ public:
       Dec
     | Dec COMMA DecList
     */
-    void analyzeDecList(TreeNode *node)
+    void analyzeDecList(TreeNode *node, Type specifier)
     {
-        analyzeDec(node->child[0]);
+        analyzeDec(node->child[0], specifier);
         if (node->child.size() == 3)
-        { 
+        {
             // Dec COMMA DecList
-            analyzeDecList(node->child[2]);
+            analyzeDecList(node->child[2], specifier);
         }
     }
 
@@ -324,11 +328,12 @@ public:
       VarDec
     | VarDec ASSIGN Exp
     */
-    void analyzeDec(TreeNode *node)
+    void analyzeDec(TreeNode *node, Type specifier)
     {
-        analyzeVarDec(node->child[0]);
+        // TODO symbol table
+        analyzeVarDec(node->child[0], specifier);
         if (node->child.size() == 3)
-        { 
+        {
             // VarDec ASSIGN Exp
             // TODO type check
             analyzeExp(node->child[2]);
@@ -362,23 +367,24 @@ public:
     | FLOAT
     | CHAR
     */
-    void analyzeExp(TreeNode *node)
+    Type analyzeExp(TreeNode *node, bool needBool = 0)
     {
+        // TODO type check needBool check
         if (node->child.size() == 3)
-        { 
+        {
             // yidadui
             if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
-            { 
+            {
                 // ID LP RP
                 return;
             }
             else if (node->child[0]->child.empty() && !node->child[1]->child.empty() && node->child[2]->child.empty())
-            { 
+            {
                 // LP Exp RP
                 analyzeExp(node->child[1]);
             }
             else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
-            { 
+            {
                 // Exp DOT ID
                 analyzeExp(node->child[0]);
             }
@@ -395,12 +401,12 @@ public:
         else if (node->child.size() == 4)
         {
             if (node->child[0]->child.empty())
-            { 
+            {
                 // ID LP Args RP
                 analyzeArgs(node->child[2]);
             }
             else
-            { 
+            {
                 // Exp LB Exp RB
                 analyzeExp(node->child[0]);
                 analyzeExp(node->child[2]);
@@ -421,7 +427,7 @@ public:
     {
         analyzeExp(node->child[0]);
         if (node->child.size() == 3)
-        { 
+        {
             // Exp COMMA Args
             analyzeArgs(node->child[2]);
         }
