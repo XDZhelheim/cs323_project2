@@ -7,13 +7,12 @@
 
 using std::map;
 
-map<string, Type *> symbolTable;
+map<string, Type> symbolTable;
 
 class Analyser
 {
 private:
     TreeNode *root;
-    ofstream out;
 
 public:
     Analyser(TreeNode *node, string path)

@@ -1,59 +1,98 @@
 #ifndef TYPE_HPP
 #define TYPE_HPP
 
-enum Category
-{
-    PRIMITIVE,
-    ARRAY,
-    STRUCTURE
-};
+#include <string>
+#include <vector>
+#include "ErrorPrinter.hpp"
 
-enum Primitive
+using std::string;
+using std::vector;
+
+enum Category
 {
     INT_VAL,
     FLOAT_VAL,
-    CHAR_VAL
+    CHAR_VAL,
+    ARRAY,
+    STRUCTURE,
+    FUNCTION
 };
 
 class Array;
-class FieldList;
 
 class Type
 {
 public:
     string name;
     Category category;
-    union
+
+    string primitive_value;
+
+    Array array;
+
+    vector<Type> varlist;
+
+    Type() = default;
+
+    Type *getChild(int lineno)
     {
-        Primitive primitive;
-        Array *array;
-        vector<FieldList> structure;
-    };
+        if (category == Category::ARRAY)
+        {
+            return &array.type;
+        }
+        else
+        {
+            print_type_12(lineno);
+            return nullptr;
+        }
+    }
+
+    string getSigniture()
+    {
+        string base = "";
+        Type t = *this;
+        switch (category)
+        {
+        case Category::INT_VAL:
+            return "int";
+
+        case Category::FLOAT_VAL:
+            return "float";
+
+        case Category::CHAR_VAL:
+            return "char";
+
+        case Category::ARRAY:
+            while (t.category == Category::ARRAY)
+            {
+                t = *t.getChild(-1);
+                base += "*";
+            }
+
+            return t.getSigniture() + base;
+
+        case Category::STRUCTURE:
+            return "struct " + name;
+
+        case Category::FUNCTION:
+            return "Func " + name;
+
+        default:
+            break;
+        }
+    }
 };
 
 class Array
 {
 public:
-    Type *base;
+    Type type;
     int size;
 
-    Array(Type *_base, int _size)
+    Array(Type _type, int _size)
     {
-        base = _base;
+        type = type;
         size = _size;
-    }
-};
-
-class FieldList
-{
-public:
-    string name;
-    Type *type;
-
-    FieldList(string _name, Type *_type)
-    {
-        name = _name;
-        type = _type;
     }
 };
 
