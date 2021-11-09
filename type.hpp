@@ -40,7 +40,7 @@ public:
 
     Type(Category _category, string _name="");
 
-    Type *getChild(int lineno);
+    Type getChild(int lineno);
 
     string getSigniture();
 };
@@ -59,17 +59,17 @@ Type::Type(Category _category, string _name) {
     name=_name;
 }
 
-Type *Type::getChild(int lineno)
+Type Type::getChild(int lineno)
 {
 
     if (category == Category::ARRAY)
     {
-        return &array->type;
+        return array->type;
     }
     else
     {
         print_type_10(lineno);
-        return nullptr;
+        return Type(Category::ERROR_VAL);
     }
 }
 
@@ -94,7 +94,7 @@ string Type::getSigniture()
     case Category::ARRAY:
         while (t.category == Category::ARRAY)
         {
-            t = *t.getChild(-1);
+            t = t.getChild(-1);
             base += "*";
         }
 

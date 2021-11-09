@@ -9,6 +9,27 @@ using std::map;
 
 map<string, Type> symbolTable;
 
+bool isArithmatic(string name)
+{
+    return name == "PLUS" || name == "MINUS" || name == "MUL" || name == "DIV";
+}
+
+bool check_func_signature(vector<Type> func, vector<Type> varList)
+{
+    if (func.size() != varList.size()) 
+    {
+        return false;
+    }
+    for (int i = 0; i < func.size(); i++)
+    {
+        if (func[i].getSigniture() != varList[i].getSigniture())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 class Analyser
 {
 private:
@@ -151,16 +172,16 @@ public:
         {
             // TODO symbol table
             // ID
-            TreeNode* id = node->child[0];
-            symbolTable[id->data]=specifier;
+            TreeNode *id = node->child[0];
+            symbolTable[id->data] = specifier;
         }
         else
         {
             // VarDec LB INT RB
             // TODO recursive
             Type arrSpecifier;
-            arrSpecifier.category=Category::ARRAY;
-            arrSpecifier.array=new Array(specifier, strtol(node->child[2]->data.c_str(), NULL, 0));
+            arrSpecifier.category = Category::ARRAY;
+            arrSpecifier.array = new Array(specifier, strtol(node->child[2]->data.c_str(), NULL, 0));
             analyzeVarDec(node->child[0], arrSpecifier);
         }
     }
@@ -343,23 +364,23 @@ public:
 
     /*
     Exp: 
-      Exp ASSIGN Exp
-    | Exp AND Exp
-    | Exp OR Exp
-    | Exp LT Exp
-    | Exp LE Exp
-    | Exp GT Exp
-    | Exp GE Exp
-    | Exp NE Exp
-    | Exp EQ Exp
-    | Exp PLUS Exp
-    | Exp MINUS Exp
-    | Exp MUL Exp
-    | Exp DIV Exp
-    | LP Exp RP
-    | MINUS Exp
-    | NOT Exp
-    | ID LP Args RP
+      Exp ASSIGN Exp                type check
+    | Exp AND Exp                   int, int -> int
+    | Exp OR Exp                    int, int -> int
+    | Exp LT Exp                    int, int -> int
+    | Exp LE Exp                    int, int -> int
+    | Exp GT Exp                    int, int -> int
+    | Exp GE Exp                    int, int -> int
+    | Exp NE Exp                    int, int -> int
+    | Exp EQ Exp                    int, int -> int
+    | Exp PLUS Exp                  T, T -> T
+    | Exp MINUS Exp                 T, T -> T
+    | Exp MUL Exp                   T, T -> T
+    | Exp DIV Exp                   T, T -> T
+    | LP Exp RP                     T -> T
+    | MINUS Exp                     T -> -T
+    | NOT Exp                       int -> int
+    | ID LP Args RP                 func
     | ID LP RP
     | Exp LB Exp RB
     | Exp DOT ID
@@ -377,64 +398,105 @@ public:
             if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // ID LP RP
+                // TODO func check
                 return;
             }
             else if (node->child[0]->child.empty() && !node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // LP Exp RP
-                analyzeExp(node->child[1]);
+                return analyzeExp(node->child[1]);
             }
             else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // Exp DOT ID
+                // TODO get struct type
                 analyzeExp(node->child[0]);
             }
             else
             {
-                analyzeExp(node->child[0]);
-                analyzeExp(node->child[2]);
+                Type exp1 = analyzeExp(node->child[0]);
+                Type exp2 = analyzeExp(node->child[2]);
+                if (exp1.getSigniture() != exp2.getSigniture() || exp1.category == Category::ERROR_VAL)
+                {
+                    if (node->child[1]->name == "ASSIGN")
+                    {
+                        print_type_5(node->pos);
+                    }
+                    else
+                    {
+                        print_type_7(node->pos);
+                    }
+                    return Type(Category::ERROR_VAL);
+                }
+                if (isArithmatic(node->child[1]->name))
+                {
+                    return Type(exp1.category, exp1.name);
+                }
+                return Type(Category::INT_VAL);
             }
         }
         else if (node->child.size() == 2)
         {
-            analyzeExp(node->child[1]);
+            return analyzeExp(node->child[1]);
         }
         else if (node->child.size() == 4)
         {
             if (node->child[0]->child.empty())
             {
                 // ID LP Args RP
-                analyzeArgs(node->child[2]);
+                vector<Type> varList;
+                analyzeArgs(node->child[2], varList);
+                if (symbolTable.count(node->child[0]->data))
+                {
+                    print_type_2(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
+                Type exp = symbolTable[node->child[0]->data];
+                if (exp.category!=Category::FUNCTION)
+                {
+                    print_type_11(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
+                if (!check_func_signature(exp.varlist, varList))
+                {
+                    print_type_9(node->pos);
+                    return Type(ERROR_VAL);
+                }
             }
             else
             {
                 // Exp LB Exp RB
-                analyzeExp(node->child[0]);
-                analyzeExp(node->child[2]);
+                Type exp1 = analyzeExp(node->child[0]);
+                Type exp2 = analyzeExp(node->child[2]);
+                if (exp2.getSigniture() != "int")
+                {
+                    print_type_10(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
+                return exp1.getChild(node->pos);
             }
         }
         else
         {
-            Type t;
             switch (node->type)
             {
             case DataType::INT_TYPE:
-                t.category = Category::INT_VAL;
-                break;
-                
+                return Type(Category::INT_VAL);
+
             case DataType::FLOAT_TYPE:
-                t.category = Category::FLOAT_VAL;
-                break;
-                
+                return Type(Category::FLOAT_VAL);
+
             case DataType::CHAR_TYPE:
-                t.category = Category::CHAR_VAL;
-                break;
-            
+                return Type(Category::CHAR_VAL);
+
             default:
-                // TODO ID
-                break;
+                if (symbolTable.count(node->child[0]->data))
+                {
+                    return symbolTable[node->child[0]->data];
+                }
+                print_type_1(node->pos);
+                return Type(Category::ERROR_VAL);
             }
-            return t;
         }
     }
 
@@ -443,13 +505,13 @@ public:
       Exp COMMA Args
     | Exp
     */
-    void analyzeArgs(TreeNode *node)
+    void analyzeArgs(TreeNode *node, vector<Type> &varList)
     {
-        analyzeExp(node->child[0]);
+        varList.push_back(analyzeExp(node->child[0]));
         if (node->child.size() == 3)
         {
             // Exp COMMA Args
-            analyzeArgs(node->child[2]);
+            analyzeArgs(node->child[2], varList);
         }
     }
 };
