@@ -65,7 +65,6 @@ public:
     {
         if (node->child.size() == 2)
         {
-            // TODO symbol table
             analyzeSpecifier(node->child[0]);
             // Specifier SEMI
         }
@@ -414,7 +413,26 @@ public:
         }
         else
         {
-            // TODO ID INT FLOAT CHAR
+            Type t;
+            switch (node->type)
+            {
+            case DataType::INT_TYPE:
+                t.category = Category::INT_VAL;
+                break;
+                
+            case DataType::FLOAT_TYPE:
+                t.category = Category::FLOAT_VAL;
+                break;
+                
+            case DataType::CHAR_TYPE:
+                t.category = Category::CHAR_VAL;
+                break;
+            
+            default:
+                // TODO ID
+                break;
+            }
+            return t;
         }
     }
 

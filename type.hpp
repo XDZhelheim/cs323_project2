@@ -13,6 +13,9 @@ enum Category
     INT_VAL,
     FLOAT_VAL,
     CHAR_VAL,
+    INT_VAR,
+    FLOAT_VAR,
+    CHAR_VAR,
     ARRAY,
     STRUCTURE,
     FUNCTION
