@@ -18,7 +18,8 @@ enum Category
     CHAR_VAR,
     ARRAY,
     STRUCTURE,
-    FUNCTION
+    FUNCTION,
+    ERROR_VAL
 };
 
 class Array;
@@ -79,12 +80,15 @@ string Type::getSigniture()
     switch (category)
     {
     case Category::INT_VAL:
+    case Category::INT_VAR:
         return "int";
 
     case Category::FLOAT_VAL:
+    case Category::FLOAT_VAR:
         return "float";
 
     case Category::CHAR_VAL:
+    case Category::CHAR_VAR:
         return "char";
 
     case Category::ARRAY:
@@ -103,7 +107,7 @@ string Type::getSigniture()
         return "Func " + name;
 
     default:
-        break;
+        return "NULL";
     }
 }
 
