@@ -65,8 +65,8 @@ public:
     {
         if (node->child.size() == 2)
         {
-            analyzeSpecifier(node->child[0]);
             // Specifier SEMI
+            analyzeSpecifier(node->child[0]);
         }
         else
         {
@@ -94,11 +94,8 @@ public:
     void analyzeExtDecList(TreeNode *node, Type specifier)
     {
         analyzeVarDec(node->child[0], specifier);
-        if (node->child.size() == 1)
-        {
-            // VarDec
-        }
-        else
+
+        if (node->child.size() == 3)
         {
             // VarDec COMMA ExtDecList
             analyzeExtDecList(node->child[2], specifier);
@@ -154,12 +151,17 @@ public:
         {
             // TODO symbol table
             // ID
+            TreeNode* id = node->child[0];
+            symbolTable[id->data]=specifier;
         }
         else
         {
             // VarDec LB INT RB
-            // TODO recursive 
-            analyzeVarDec(node->child[0], specifier);
+            // TODO recursive
+            Type arrSpecifier;
+            arrSpecifier.category=Category::ARRAY;
+            arrSpecifier.array=new Array(specifier, strtol(node->child[2]->data.c_str(), NULL, 0));
+            analyzeVarDec(node->child[0], arrSpecifier);
         }
     }
 
