@@ -32,8 +32,6 @@ public:
 
     vector<Type> varlist;
 
-    Type() = default;
-
     Type *getChild(int lineno);
 
     string getSigniture();
@@ -57,7 +55,7 @@ Type *Type::getChild(int lineno)
     }
     else
     {
-        print_type_12(lineno);
+        print_type_10(lineno);
         return nullptr;
     }
 }
@@ -99,7 +97,7 @@ string Type::getSigniture()
 
 Array::Array(Type _type, int _size)
 {
-    type = type;
+    type = _type;
     size = _size;
 }
 
