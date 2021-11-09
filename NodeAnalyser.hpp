@@ -30,6 +30,18 @@ bool check_func_signature(vector<Type> func, vector<Type> varList)
     return true;
 }
 
+Type find_structure_mem(vector<Type> varList, string name)
+{
+    for (auto var : varList)
+    {
+        if (var.name == name)
+        {
+            return var;
+        }
+    }
+    return Type(Category::ERROR_VAL);
+}
+
 class Analyser
 {
 private:
@@ -288,13 +300,13 @@ public:
         else if (node->child.size() == 5)
         {
             // IF LP Exp RP Stmt & WHILE LP Exp RP Stmt
-            analyzeExp(node->child[2], 1);
+            analyzeExp(node->child[2]);
             analyzeStmt(node->child[4], specifier);
         }
         else
         {
             // IF LP Exp RP Stmt ELSE Stmt
-            analyzeExp(node->child[2], 1);
+            analyzeExp(node->child[2]);
             analyzeStmt(node->child[4], specifier);
             analyzeStmt(node->child[6], specifier);
         }
@@ -389,17 +401,31 @@ public:
     | FLOAT
     | CHAR
     */
-    Type analyzeExp(TreeNode *node, bool needBool = 0)
+    Type analyzeExp(TreeNode *node)
     {
-        // TODO type check needBool check
         if (node->child.size() == 3)
         {
             // yidadui
             if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // ID LP RP
-                // TODO func check
-                return;
+                if (symbolTable.count(node->child[0]->data))
+                {
+                    print_type_2(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
+                Type exp = symbolTable[node->child[0]->data];
+                if (exp.category!=Category::FUNCTION)
+                {
+                    print_type_11(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
+                if (exp.varlist.size() != 0)
+                {
+                    print_type_9(node->pos);
+                    return Type(ERROR_VAL);
+                }
+                return *exp.returnType;
             }
             else if (node->child[0]->child.empty() && !node->child[1]->child.empty() && node->child[2]->child.empty())
             {
@@ -409,8 +435,19 @@ public:
             else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // Exp DOT ID
-                // TODO get struct type
-                analyzeExp(node->child[0]);
+                Type exp = analyzeExp(node->child[0]);
+                if (exp.category != Category::STRUCTURE)
+                {
+                    print_type_13(node->pos);
+                    return Type(ERROR_VAL);
+                }
+                Type t = find_structure_mem(exp.varlist, node->child[2]->data);
+                if (t.category == Category::ERROR_VAL) 
+                {
+                    print_type_14(node->pos);
+                    return Type(ERROR_VAL);
+                }
+                return t;
             }
             else
             {
@@ -462,6 +499,7 @@ public:
                     print_type_9(node->pos);
                     return Type(ERROR_VAL);
                 }
+                return *exp.returnType;
             }
             else
             {
@@ -492,7 +530,12 @@ public:
             default:
                 if (symbolTable.count(node->child[0]->data))
                 {
-                    return symbolTable[node->child[0]->data];
+                    Type t = symbolTable[node->child[0]->data];
+                    if (t.category == Category::STRUCTURE && node->child[0]->data == t.name) 
+                    {
+                        return Type(Category::ERROR_VAL);
+                    }
+                    return t;
                 }
                 print_type_1(node->pos);
                 return Type(Category::ERROR_VAL);
