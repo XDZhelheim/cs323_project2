@@ -80,8 +80,10 @@ public:
             else
             {
                 // Specifier FunDec CompSt
-                analyzeFunDec(node->child[1], specifier);
-                analyzeCompSt(node->child[2], specifier);
+                Type funcType(Category::FUNCTION);
+                funcType.returnType=&specifier;
+                analyzeFunDec(node->child[1], funcType);
+                analyzeCompSt(node->child[2], funcType);
             }
         }
     }
@@ -112,7 +114,17 @@ public:
         if (node->child[0]->child.empty())
         {
             // TYPE
-            // TODO check type
+            Category category;
+            if (node->child[0]->data=="int") {
+                category=Category::INT_VAR;
+            }
+            else if (node->child[0]->data=="float") {
+                category=Category::FLOAT_VAR;
+            }
+            else if (node->child[0]->data=="char") {
+                category=Category::CHAR_VAR;
+            }
+            return Type(category);
         }
         else
         {
@@ -128,16 +140,24 @@ public:
     */
     Type analyzeStructSpecifier(TreeNode *node)
     {
+        // TODO symbol table
+        Type structSpecifier(Category::STRUCTURE);
+
+        TreeNode* id=node->child[1];
+        if (symbolTable.count(id->data)>0) {
+            print_type_15(id->pos);
+            return structSpecifier;
+        }
+        structSpecifier.name=id->data;
+        symbolTable[id->data]=structSpecifier;
+
         if (node->child.size() == 5)
         {
-            // TODO symbol table
             // STRUCT ID LC DefList RC
-            analyzeDefList(node->child[3]);
+            analyzeDefList(node->child[3], structSpecifier.varlist);
         }
-        else
-        {
-            // TODO check struct
-        }
+
+        return structSpecifier;
     }
 
     /*
@@ -145,14 +165,21 @@ public:
       ID
     | VarDec LB INT RB
     */
-    void analyzeVarDec(TreeNode *node, Type specifier)
+    void analyzeVarDec(TreeNode *node, Type &specifier)
     {
         if (node->child.size() == 1)
         {
             // TODO symbol table
             // ID
             TreeNode* id = node->child[0];
+
+            if (symbolTable.count(id->data)>0) {
+                print_type_3(id->pos);
+                return;
+            }
+
             symbolTable[id->data]=specifier;
+            specifier.name=id->data;
         }
         else
         {
@@ -170,14 +197,22 @@ public:
       ID LP VarList RP
     | ID LP RP
     */
-    void analyzeFunDec(TreeNode *node, Type specifier)
+    void analyzeFunDec(TreeNode *node, Type &funcType)
     {
         // TODO symbol table
-        Type func;
+
+        TreeNode* id=node->child[0];
+        if (symbolTable.count(id->data)>0) {
+            print_type_4(id->pos);
+            return;
+        }
+        symbolTable[id->data]=funcType;
+        funcType.name=id->data;
+
         if (node->child.size() == 4)
         {
             // ID LP VarList RP
-            analyzeVarList(node->child[2], func.varlist);
+            analyzeVarList(node->child[2], funcType.varlist);
         }
     }
 
@@ -203,18 +238,19 @@ public:
     void analyzeParamDec(TreeNode *node, vector<Type> &args)
     {
         Type specifier = analyzeSpecifier(node->child[0]);
-        // TODO recursive
         analyzeVarDec(node->child[1], specifier);
+        args.push_back(specifier);
     }
 
     /*
     CompSt: 
       LC DefList StmtList RC
     */
-    void analyzeCompSt(TreeNode *node, Type specifier)
+    void analyzeCompSt(TreeNode *node, Type &funcType)
     {
-        analyzeDefList(node->child[0]);
-        analyzeStmtList(node->child[1], specifier);
+        vector<Type> trash;
+        analyzeDefList(node->child[0], trash);
+        analyzeStmtList(node->child[1], funcType);
     }
 
     /*
@@ -222,7 +258,7 @@ public:
       Stmt StmtList
     | %empty
     */
-    void analyzeStmtList(TreeNode *node, Type specifier)
+    void analyzeStmtList(TreeNode *node, Type funcType)
     {
         if (node->child.empty())
         {
@@ -232,8 +268,8 @@ public:
         else
         {
             // Stmt StmtList
-            analyzeStmt(node->child[0], specifier);
-            analyzeStmtList(node->child[1], specifier);
+            analyzeStmt(node->child[0], funcType);
+            analyzeStmtList(node->child[1], funcType);
         }
     }
 
@@ -262,6 +298,10 @@ public:
         {
             // RETURN Exp SEMI
             Type exp = analyzeExp(node->child[2]);
+            if (specifier.getSigniture()!=exp.getSigniture()) {
+                print_type_8(node->pos);
+                return;
+            }
             // TODO check type
         }
         else if (node->child.size() == 5)
@@ -284,18 +324,13 @@ public:
       Def DefList
     | %empty
     */
-    void analyzeDefList(TreeNode *node)
+    void analyzeDefList(TreeNode *node, vector<Type>& varlist)
     {
         if (node->child.size() == 2)
         {
             // Def DefList
-            analyzeDef(node->child[0]);
-            analyzeDefList(node->child[1]);
-        }
-        else
-        {
-            // empty
-            return;
+            analyzeDef(node->child[0], varlist);
+            analyzeDefList(node->child[1], varlist);
         }
     }
 
@@ -303,10 +338,11 @@ public:
     Def: 
       Specifier DecList SEMI 
     */
-    void analyzeDef(TreeNode *node)
+    void analyzeDef(TreeNode *node, vector<Type>& varlist)
     {
         Type specifier = analyzeSpecifier(node->child[0]);
         analyzeDecList(node->child[1], specifier);
+        varlist.push_back(specifier);
     }
 
     /*
@@ -314,7 +350,7 @@ public:
       Dec
     | Dec COMMA DecList
     */
-    void analyzeDecList(TreeNode *node, Type specifier)
+    void analyzeDecList(TreeNode *node, Type &specifier)
     {
         analyzeDec(node->child[0], specifier);
         if (node->child.size() == 3)
@@ -329,7 +365,7 @@ public:
       VarDec
     | VarDec ASSIGN Exp
     */
-    void analyzeDec(TreeNode *node, Type specifier)
+    void analyzeDec(TreeNode *node, Type &specifier)
     {
         // TODO symbol table
         analyzeVarDec(node->child[0], specifier);

@@ -36,6 +36,8 @@ public:
 
     vector<Type> varlist;
 
+    Type *returnType;
+
     Type() = default;
 
     Type(Category _category, string _name="");
