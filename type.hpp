@@ -35,6 +35,10 @@ public:
 
     vector<Type> varlist;
 
+    Type() = default;
+
+    Type(Category _category, string _name="");
+
     Type *getChild(int lineno);
 
     string getSigniture();
@@ -48,6 +52,11 @@ public:
 
     Array(Type _type, int _size);
 };
+
+Type::Type(Category _category, string _name) {
+    category=_category;
+    name=_name;
+}
 
 Type *Type::getChild(int lineno)
 {
