@@ -508,6 +508,11 @@ public:
                     }
                     return Type(Category::ERROR_VAL);
                 }
+                if (node -> child[1]->name == "ASSIGN" && (exp1.category == Category::INT_VAL || exp1.category == Category::FLOAT_VAL || exp1.category == CHAR_VAR))
+                {
+                    print_type_6(node->pos);
+                    return Type(Category::ERROR_VAL);
+                }
                 if (isArithmatic(node->child[1]->name))
                 {
                     return Type(exp1.category, exp1.name);
