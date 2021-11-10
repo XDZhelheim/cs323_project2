@@ -499,7 +499,7 @@ public:
             if (node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // ID LP RP
-                if (symbolTable.count(node->child[0]->data))
+                if (!symbolTable.count(node->child[0]->data))
                 {
                     print_type_2(node->pos);
                     return Type(Category::ERROR_VAL);
@@ -581,7 +581,7 @@ public:
                 // ID LP Args RP
                 vector<Type> varList;
                 analyzeArgs(node->child[2], varList);
-                if (symbolTable.count(node->child[0]->data))
+                if (!symbolTable.count(node->child[0]->data))
                 {
                     print_type_2(node->pos);
                     return Type(Category::ERROR_VAL);
