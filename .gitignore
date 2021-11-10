@@ -67,3 +67,5 @@ lex.yy.c
 /test-self/*.out
 
 temp*
+
+.DS_Store
