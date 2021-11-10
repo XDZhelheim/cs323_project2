@@ -16,7 +16,7 @@ bool isArithmatic(string name)
 
 bool check_func_signature(vector<Type> func, vector<Type> varList)
 {
-    if (func.size() != varList.size()) 
+    if (func.size() != varList.size())
     {
         return false;
     }
@@ -114,7 +114,7 @@ public:
             {
                 // Specifier FunDec CompSt
                 Type funcType(Category::FUNCTION);
-                funcType.returnType=&specifier;
+                funcType.returnType = &specifier;
                 analyzeFunDec(node->child[1], funcType);
                 analyzeCompSt(node->child[2], funcType);
             }
@@ -148,14 +148,17 @@ public:
         {
             // TYPE
             Category category;
-            if (node->child[0]->data=="int") {
-                category=Category::INT_VAR;
+            if (node->child[0]->data == "int")
+            {
+                category = Category::INT_VAR;
             }
-            else if (node->child[0]->data=="float") {
-                category=Category::FLOAT_VAR;
+            else if (node->child[0]->data == "float")
+            {
+                category = Category::FLOAT_VAR;
             }
-            else if (node->child[0]->data=="char") {
-                category=Category::CHAR_VAR;
+            else if (node->child[0]->data == "char")
+            {
+                category = Category::CHAR_VAR;
             }
             return Type(category);
         }
@@ -176,13 +179,14 @@ public:
         // TODO symbol table
         Type structSpecifier(Category::STRUCTURE);
 
-        TreeNode* id=node->child[1];
-        if (symbolTable.count(id->data)>0) {
+        TreeNode *id = node->child[1];
+        if (symbolTable.count(id->data) > 0)
+        {
             print_type_15(id->pos);
             return structSpecifier;
         }
-        structSpecifier.name=id->data;
-        symbolTable[id->data]=structSpecifier;
+        structSpecifier.name = id->data;
+        symbolTable[id->data] = structSpecifier;
 
         if (node->child.size() == 5)
         {
@@ -204,15 +208,16 @@ public:
         {
             // TODO symbol table
             // ID
-            TreeNode* id = node->child[0];
+            TreeNode *id = node->child[0];
 
-            if (symbolTable.count(id->data)>0) {
+            if (symbolTable.count(id->data) > 0)
+            {
                 print_type_3(id->pos);
                 return;
             }
 
-            symbolTable[id->data]=specifier;
-            specifier.name=id->data;
+            symbolTable[id->data] = specifier;
+            specifier.name = id->data;
         }
         else
         {
@@ -234,13 +239,14 @@ public:
     {
         // TODO symbol table
 
-        TreeNode* id=node->child[0];
-        if (symbolTable.count(id->data)>0) {
+        TreeNode *id = node->child[0];
+        if (symbolTable.count(id->data) > 0)
+        {
             print_type_4(id->pos);
             return;
         }
-        symbolTable[id->data]=funcType;
-        funcType.name=id->data;
+        symbolTable[id->data] = funcType;
+        funcType.name = id->data;
 
         if (node->child.size() == 4)
         {
@@ -331,7 +337,8 @@ public:
         {
             // RETURN Exp SEMI
             Type exp = analyzeExp(node->child[2]);
-            if (specifier.getSigniture()!=exp.getSigniture()) {
+            if (specifier.getSigniture() != exp.getSigniture())
+            {
                 print_type_8(node->pos);
                 return;
             }
@@ -357,7 +364,7 @@ public:
       Def DefList
     | %empty
     */
-    void analyzeDefList(TreeNode *node, vector<Type>& varlist)
+    void analyzeDefList(TreeNode *node, vector<Type> &varlist)
     {
         if (node->child.size() == 2)
         {
@@ -371,7 +378,7 @@ public:
     Def: 
       Specifier DecList SEMI 
     */
-    void analyzeDef(TreeNode *node, vector<Type>& varlist)
+    void analyzeDef(TreeNode *node, vector<Type> &varlist)
     {
         Type specifier = analyzeSpecifier(node->child[0]);
         analyzeDecList(node->child[1], specifier);
@@ -451,7 +458,7 @@ public:
                     return Type(Category::ERROR_VAL);
                 }
                 Type exp = symbolTable[node->child[0]->data];
-                if (exp.category!=Category::FUNCTION)
+                if (exp.category != Category::FUNCTION)
                 {
                     print_type_11(node->pos);
                     return Type(Category::ERROR_VAL);
@@ -478,7 +485,7 @@ public:
                     return Type(ERROR_VAL);
                 }
                 Type t = find_structure_mem(exp.varlist, node->child[2]->data);
-                if (t.category == Category::ERROR_VAL) 
+                if (t.category == Category::ERROR_VAL)
                 {
                     print_type_14(node->pos);
                     return Type(ERROR_VAL);
@@ -525,7 +532,7 @@ public:
                     return Type(Category::ERROR_VAL);
                 }
                 Type exp = symbolTable[node->child[0]->data];
-                if (exp.category!=Category::FUNCTION)
+                if (exp.category != Category::FUNCTION)
                 {
                     print_type_11(node->pos);
                     return Type(Category::ERROR_VAL);
@@ -567,7 +574,7 @@ public:
                 if (symbolTable.count(node->child[0]->data))
                 {
                     Type t = symbolTable[node->child[0]->data];
-                    if (t.category == Category::STRUCTURE && node->child[0]->data == t.name) 
+                    if (t.category == Category::STRUCTURE && node->child[0]->data == t.name)
                     {
                         return Type(Category::ERROR_VAL);
                     }
