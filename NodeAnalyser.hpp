@@ -367,7 +367,8 @@ public:
         {
             // RETURN Exp SEMI
             Type exp = analyzeExp(node->child[1]);
-            if (specifier.getSigniture() != exp.getSigniture())
+            if (DEBUG) cout<<"Maybe error8, exp = "<<exp.getSigniture()<<", spec = "<<specifier.returnType->getSigniture()<<endl;
+            if (specifier.returnType->getSigniture() != exp.getSigniture())
             {
                 print_type_8(node->pos);
                 return;
@@ -540,6 +541,7 @@ public:
             }
             else
             {
+                // Exp op Exp
                 Type exp1 = analyzeExp(node->child[0]);
                 Type exp2 = analyzeExp(node->child[2]);
                 if (exp1.getSigniture() != exp2.getSigniture() || exp1.category == Category::ERROR_VAL)
@@ -550,7 +552,9 @@ public:
                     }
                     else
                     {
-                        print_type_7(node->pos);
+                        if (DEBUG) cout<<"Maybe error7, exp1 = "<<exp1.getSigniture()<<", exp2 = "<<exp2.getSigniture()<<endl;
+                        if (exp1.category != Category::ERROR_VAL && exp2.category != Category::ERROR_VAL)
+                            print_type_7(node->pos);
                     }
                     return Type(Category::ERROR_VAL);
                 }
@@ -610,6 +614,7 @@ public:
         }
         else
         {
+            // INT FLOAT CHAR ID
             switch (node->child[0]->type)
             {
             case DataType::INT_TYPE:
