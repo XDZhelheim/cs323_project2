@@ -336,7 +336,7 @@ public:
         else if (node->child.size() == 3)
         {
             // RETURN Exp SEMI
-            Type exp = analyzeExp(node->child[2]);
+            Type exp = analyzeExp(node->child[1]);
             if (specifier.getSigniture() != exp.getSigniture())
             {
                 print_type_8(node->pos);

@@ -32,7 +32,7 @@ struct TreeNode
     string name;
     DataType type;
     int pos;
-    TreeNode *parent;
+    TreeNode *parent = nullptr;
     string data;
     vector<TreeNode *> child;
 };
