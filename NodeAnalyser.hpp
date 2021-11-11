@@ -1,6 +1,6 @@
 #ifndef NODE_ANALYSER_HPP
 #define NODE_ANALYSER_HPP
-#define DEBUG 1
+#define DEBUG 0
 
 #include "TreeNode.hpp"
 #include "Type.hpp"
@@ -592,7 +592,6 @@ public:
                     return new Type(ERROR_VAL);
                 }
                 Type *t = find_structure_mem(exp->structType->varlist, node->child[2]->data);
-                cout << "\t\t\t\t\t" << exp->structType->varlist[0]->name << endl;
                 if (t->category == Category::ERROR_VAL)
                 {
                     print_type_14(node->pos);
