@@ -221,11 +221,6 @@ public:
         }
         else
         {
-            // if (symbolTable.count(id->data) == 0)
-            // {
-            //     print_type_1(id->pos);
-            //     return new Type(Category::ERROR_VAL);
-            // }
             return symbolTable[id->data];
         }
     }
@@ -255,11 +250,11 @@ public:
                 print_type_3(id->pos);
                 return new Type(Category::ERROR_VAL);
             }
-            if (specifier->category == Category::STRUCTURE_DEF)
+            if (specifier->category == Category::STRUCTURE_VAL)
             {
                 Type *spec = new Type(Category::STRUCTURE_VAL);
                 spec->name = id->data;
-                spec->structType = specifier;
+                spec->structType = specifier->structType;
                 symbolTable[id->data] = spec;
                 return spec;
             }
@@ -476,6 +471,12 @@ public:
             cout << "Def" << endl;
 
         Type *specifier = analyzeSpecifier(node->child[0]);
+        if (specifier->category == Category::STRUCTURE_DEF)
+        {
+            Type *sp = specifier;
+            specifier = new Type(Category::STRUCTURE_VAL);
+            specifier->structType = sp;
+        }
         analyzeDecList(node->child[1], specifier, spec);
     }
 
@@ -683,7 +684,7 @@ public:
                     return new Type(Category::ERROR_VAL);
                 }
                 
-                return exp1->getChild(node->pos);
+                return exp1->array->type;
             }
         }
         else
