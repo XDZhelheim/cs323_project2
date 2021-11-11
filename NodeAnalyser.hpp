@@ -489,7 +489,9 @@ public:
         if (DEBUG)
             cout << "DecList" << endl;
 
-        func->varlist.push_back(analyzeDec(node->child[0], specifier));
+        Type *dec = analyzeDec(node->child[0], specifier);
+        func->varlist.push_back(dec);
+        symbolTable[dec->name] = dec;
         if (node->child.size() == 3)
         {
             // Dec COMMA DecList
@@ -691,7 +693,7 @@ public:
                 if (symbolTable.count(node->child[0]->data))
                 {
                     Type *t = symbolTable[node->child[0]->data];
-                    if (t->category != Category::STRUCTURE_VAL)
+                    if (t->category == Category::STRUCTURE_DEF)
                     {
                         return new Type(Category::ERROR_VAL);
                     }
