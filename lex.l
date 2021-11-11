@@ -25,7 +25,7 @@ hexdigit [0-9a-fA-F]
 
 %%
 (\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", 0, DataType::INT_TYPE, yytext); return INT; }
-{digit}+\.{digit}+                      { yylval = create_node("FLOAT", 0, DataType::FLOAT_TYPE, yytext); return FLOAT; }
+(\+?|-){digit}+\.{digit}+               { yylval = create_node("FLOAT", 0, DataType::FLOAT_TYPE, yytext); return FLOAT; }
 \'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", 0, DataType::CHAR_TYPE, yytext); return CHAR; }
 
 int|float|char  { yylval = create_node("TYPE", 0, DataType::TYPE_TYPE, yytext); return TYPE; }

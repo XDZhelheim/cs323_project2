@@ -17,14 +17,16 @@ bool isArithmatic(string name)
     return name == "PLUS" || name == "MINUS" || name == "MUL" || name == "DIV";
 }
 
-bool check_func_signature(vector<Type> func, vector<Type> varList)
+bool check_func_signature(vector<Type> &func, vector<Type> &varList)
 {
+    if (DEBUG) cout<<" Check varlist size of func call: "<<func.size()<<" and "<<varList.size()<<endl;
     if (func.size() != varList.size())
     {
         return false;
     }
     for (int i = 0; i < func.size(); i++)
     {
+        if (DEBUG) cout<<"  Compare varlist: "<<func[i].getSigniture()<<" and "<<varList[i].getSigniture()<<endl;
         if (func[i].getSigniture() != varList[i].getSigniture())
         {
             return false;
@@ -33,7 +35,7 @@ bool check_func_signature(vector<Type> func, vector<Type> varList)
     return true;
 }
 
-Type find_structure_mem(vector<Type> varList, string name)
+Type find_structure_mem(vector<Type> &varList, string name)
 {
     for (auto var : varList)
     {
@@ -226,11 +228,11 @@ public:
             // TODO symbol table
             // ID
             TreeNode *id = node->child[0];
-            if (DEBUG) cout<<"ID = "<<id->data<<endl;
+            if (DEBUG) cout<<"  ID = "<<id->data<<endl;
 
             if (symbolTable.count(id->data) > 0)
             {
-                if (DEBUG) cout<<id->data<<" has "<<symbolTable.count(id->data)<<" count in symbol table.";
+                if (DEBUG) cout<<id->data<<" has "<<symbolTable.count(id->data)<<" count in symbol table."<<endl;
                 print_type_3(id->pos);
                 return;
             }
@@ -264,10 +266,14 @@ public:
         if (symbolTable.count(id->data) > 0)
         {
             print_type_4(id->pos);
-            return;
+            // return; // @test4
         }
-        symbolTable[id->data] = funcType;
-        funcType.name = id->data;
+        else { // @test4 redefine func, keep the first definition
+            funcType.name = id->data;
+            symbolTable[id->data] = funcType;
+        }
+
+        if (DEBUG) cout<<"  Func ID = "<<id->data<<endl;
 
         if (node->child.size() == 4)
         {
@@ -300,9 +306,12 @@ public:
     void analyzeParamDec(TreeNode *node, vector<Type> &args)
     {
         if (DEBUG) cout<<"ParamDec"<<endl;
+
         Type specifier = analyzeSpecifier(node->child[0]);
         analyzeVarDec(node->child[1], specifier);
         args.push_back(specifier);
+
+        if (DEBUG) cout<<"  New args pushed: "<<specifier.category<<endl;
     }
 
     /*
@@ -592,6 +601,9 @@ public:
                     print_type_11(node->pos);
                     return Type(Category::ERROR_VAL);
                 }
+                cout<<"-----"<<node->child[0]->data<<endl;
+                cout<<"-----"<<exp.category<<endl;
+                cout<<"-----"<<exp.name<<endl;
                 if (!check_func_signature(exp.varlist, varList))
                 {
                     print_type_9(node->pos);
