@@ -1,6 +1,6 @@
 #ifndef NODE_ANALYSER_HPP
 #define NODE_ANALYSER_HPP
-#define DEBUG 1
+#define DEBUG 0
 
 #include "TreeNode.hpp"
 #include "Type.hpp"
@@ -602,9 +602,6 @@ public:
                     print_type_11(node->pos);
                     return new Type(Category::ERROR_VAL);
                 }
-                cout<<"-----"<<node->child[0]->data<<endl;
-                cout<<"-----"<<exp->category<<endl;
-                cout<<"-----"<<exp->name<<endl;
                 if (!check_func_signature(exp->varlist, varList))
                 {
                     print_type_9(node->pos);
