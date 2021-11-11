@@ -17,7 +17,8 @@ enum Category
     FLOAT_VAR,
     CHAR_VAR,
     ARRAY,
-    STRUCTURE,
+    STRUCTURE_DEF,
+    STRUCTURE_VAL,
     FUNCTION,
     ERROR_VAL
 };
@@ -105,8 +106,8 @@ string Type::getSigniture()
 
         return t->getSigniture() + base;
 
-    case Category::STRUCTURE:
-        return "struct " + name;
+    case Category::STRUCTURE_VAL:
+        return "struct " + structType->name;
 
     case Category::FUNCTION:
         return "Func " + name;
