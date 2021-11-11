@@ -24,8 +24,8 @@ digit [0-9]
 hexdigit [0-9a-fA-F]
 
 %%
-(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", yylloc.first_line, DataType::INT_TYPE, yytext); return INT; }
-(\+?|-){digit}+\.{digit}+               { yylval = create_node("FLOAT", yylloc.first_line, DataType::FLOAT_TYPE, yytext); return FLOAT; }
+0x{hexdigit}+|{digit}+    { yylval = create_node("INT", yylloc.first_line, DataType::INT_TYPE, yytext); return INT; }
+{digit}+\.{digit}+               { yylval = create_node("FLOAT", yylloc.first_line, DataType::FLOAT_TYPE, yytext); return FLOAT; }
 \'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", yylloc.first_line, DataType::CHAR_TYPE, yytext); return CHAR; }
 
 int|float|char  { yylval = create_node("TYPE", yylloc.first_line, DataType::TYPE_TYPE, yytext); return TYPE; }
@@ -59,7 +59,7 @@ return          { yylval = create_node("RETURN", yylloc.first_line); return RETU
 "["     { yylval = create_node("LB", yylloc.first_line); return LB; }
 "]"     { yylval = create_node("RB", yylloc.first_line); return RB; }
 "{"     { yylval = create_node("LC", yylloc.first_line); return LC; }
-"}"     { yylval = create_node("RC", yylloc.first_line); return RC; }
+"}"     { yylval = create_node("RC"); return RC; }
 
 "&" { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 

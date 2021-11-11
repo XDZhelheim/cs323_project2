@@ -24,7 +24,9 @@ if __name__ == "__main__":
                 out_text=out.readlines()
                 for line in out_text:
                     out_list.append(line.split(":")[0])
-                    
+            
+            if len(ans_list) != len(out_list):
+                print("{} # of lines not match".format(out_file))
             for i in range(len(ans_list)):
                 if ans_list[i]!=out_list[i]:
                     print("{} line {} is wrong.".format(out_file, i+1))

@@ -418,7 +418,7 @@ public:
             Type *exp = analyzeExp(node->child[1]);
             if (DEBUG)
                 cout << "Maybe error8, exp = " << exp->getSigniture() << ", spec = " << specifier->returnType->getSigniture() << endl;
-            if (specifier->returnType->getSigniture() != exp->getSigniture())
+            if (exp->getSigniture() != "NULL" && specifier->returnType->getSigniture() != exp->getSigniture())
             {
                 print_type_8(node->pos);
                 return;
@@ -607,7 +607,7 @@ public:
                 // Exp op Exp
                 Type *exp1 = analyzeExp(node->child[0]);
                 Type *exp2 = analyzeExp(node->child[2]);
-                if (exp1->getSigniture() != exp2->getSigniture() || exp1->category == Category::ERROR_VAL)
+                if (exp1->getSigniture() != exp2->getSigniture())
                 {
                     if (node->child[1]->name == "ASSIGN")
                     {
