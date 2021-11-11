@@ -24,42 +24,42 @@ digit [0-9]
 hexdigit [0-9a-fA-F]
 
 %%
-(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", 0, DataType::INT_TYPE, yytext); return INT; }
-(\+?|-){digit}+\.{digit}+               { yylval = create_node("FLOAT", 0, DataType::FLOAT_TYPE, yytext); return FLOAT; }
-\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", 0, DataType::CHAR_TYPE, yytext); return CHAR; }
+(\+?|-)0x{hexdigit}+|(\+?|-){digit}+    { yylval = create_node("INT", yylloc.first_line, DataType::INT_TYPE, yytext); return INT; }
+(\+?|-){digit}+\.{digit}+               { yylval = create_node("FLOAT", yylloc.first_line, DataType::FLOAT_TYPE, yytext); return FLOAT; }
+\'([\x20-\x7E]|\\x{hexdigit}{1,2})\'    { yylval = create_node("CHAR", yylloc.first_line, DataType::CHAR_TYPE, yytext); return CHAR; }
 
-int|float|char  { yylval = create_node("TYPE", 0, DataType::TYPE_TYPE, yytext); return TYPE; }
-struct          { yylval = create_node("STRUCT"); return STRUCT; }
-if              { yylval = create_node("IF"); return IF; }
-else            { yylval = create_node("ELSE"); return ELSE; }
-while           { yylval = create_node("WHILE"); return WHILE; }
-return          { yylval = create_node("RETURN"); return RETURN; }
+int|float|char  { yylval = create_node("TYPE", yylloc.first_line, DataType::TYPE_TYPE, yytext); return TYPE; }
+struct          { yylval = create_node("STRUCT", yylloc.first_line); return STRUCT; }
+if              { yylval = create_node("IF", yylloc.first_line); return IF; }
+else            { yylval = create_node("ELSE", yylloc.first_line); return ELSE; }
+while           { yylval = create_node("WHILE", yylloc.first_line); return WHILE; }
+return          { yylval = create_node("RETURN", yylloc.first_line); return RETURN; }
 
-{letter_}({letter_}|{digit})*           { yylval = create_node("ID", 0, DataType::ID_TYPE, yytext); return ID; }
+{letter_}({letter_}|{digit})*           { yylval = create_node("ID", yylloc.first_line, DataType::ID_TYPE, yytext); return ID; }
 
-"."     { yylval = create_node("DOT"); return DOT; }
-";"     { yylval = create_node("SEMI"); return SEMI; }
-","     { yylval = create_node("COMMA"); return COMMA; }
-"="     { yylval = create_node("ASSIGN"); return ASSIGN; }
-"<"     { yylval = create_node("LT"); return LT; }
-"<="    { yylval = create_node("LE"); return LE; }
-">"     { yylval = create_node("GT"); return GT; }
-">="    { yylval = create_node("GE"); return GE; }
-"!="    { yylval = create_node("NE"); return NE; }
-"=="    { yylval = create_node("EQ"); return EQ; }
-"+"     { yylval = create_node("PLUS"); return PLUS; }
-"-"     { yylval = create_node("MINUS"); return MINUS; }
-"*"     { yylval = create_node("MUL"); return MUL; }
-"/"     { yylval = create_node("DIV"); return DIV; }
-"&&"    { yylval = create_node("AND"); return AND; }
-"||"    { yylval = create_node("OR"); return OR; }
-"!"     { yylval = create_node("NOT"); return NOT; }
-"("     { yylval = create_node("LP"); return LP; }
-")"     { yylval = create_node("RP"); return RP; }
-"["     { yylval = create_node("LB"); return LB; }
-"]"     { yylval = create_node("RB"); return RB; }
-"{"     { yylval = create_node("LC"); return LC; }
-"}"     { yylval = create_node("RC"); return RC; }
+"."     { yylval = create_node("DOT",yylloc.first_line); return DOT; }
+";"     { yylval = create_node("SEMI",yylloc.first_line); return SEMI; }
+","     { yylval = create_node("COMMA", yylloc.first_line); return COMMA; }
+"="     { yylval = create_node("ASSIGN", yylloc.first_line); return ASSIGN; }
+"<"     { yylval = create_node("LT", yylloc.first_line); return LT; }
+"<="    { yylval = create_node("LE", yylloc.first_line); return LE; }
+">"     { yylval = create_node("GT", yylloc.first_line); return GT; }
+">="    { yylval = create_node("GE", yylloc.first_line); return GE; }
+"!="    { yylval = create_node("NE", yylloc.first_line); return NE; }
+"=="    { yylval = create_node("EQ", yylloc.first_line); return EQ; }
+"+"     { yylval = create_node("PLUS", yylloc.first_line); return PLUS; }
+"-"     { yylval = create_node("MINUS", yylloc.first_line); return MINUS; }
+"*"     { yylval = create_node("MUL", yylloc.first_line); return MUL; }
+"/"     { yylval = create_node("DIV", yylloc.first_line); return DIV; }
+"&&"    { yylval = create_node("AND", yylloc.first_line); return AND; }
+"||"    { yylval = create_node("OR", yylloc.first_line); return OR; }
+"!"     { yylval = create_node("NOT", yylloc.first_line); return NOT; }
+"("     { yylval = create_node("LP", yylloc.first_line); return LP; }
+")"     { yylval = create_node("RP", yylloc.first_line); return RP; }
+"["     { yylval = create_node("LB", yylloc.first_line); return LB; }
+"]"     { yylval = create_node("RB", yylloc.first_line); return RB; }
+"{"     { yylval = create_node("LC", yylloc.first_line); return LC; }
+"}"     { yylval = create_node("RC", yylloc.first_line); return RC; }
 
 "&" { 
     fprintf(output_file, "Error type A at Line %d: unknown lexeme %s\n", yylineno, yytext); 
