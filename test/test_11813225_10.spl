@@ -1,0 +1,7 @@
+int arrays()
+{
+  int a[10], b;
+  float c;
+  c = b[5];
+  f(a[1]);
+}

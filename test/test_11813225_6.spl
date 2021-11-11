@@ -1,0 +1,11 @@
+struct cui {
+  int cuiMax;
+  float cuiPro;
+  char cuiMini;
+};
+
+int cuicui()
+{
+  struct cui cuiAir;
+  cuiAir.cui1 = 100;
+}

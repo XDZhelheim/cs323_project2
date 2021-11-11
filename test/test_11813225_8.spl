@@ -1,0 +1,15 @@
+float float_func()
+{
+
+}
+
+struct float_struct 
+{
+  float float_val;
+};
+
+int main()
+{
+  struct float_struct fs;
+  fs.float_val=-float_func()-1.0;
+}

@@ -1,0 +1,10 @@
+int xyz(char xx)
+{
+
+}
+
+int maker()
+{
+  char x[5][6][7];
+  return xyz(x[1][2][3]);
+}

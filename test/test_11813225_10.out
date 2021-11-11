@@ -1,0 +1,3 @@
+Error type 10 at Line 5: applying indexing operator on non-array type variables
+Error type 5 at Line 5: unmatching types appear at both sides of the assignment operator
+Error type 2 at Line 6: a function is invoked without a definition

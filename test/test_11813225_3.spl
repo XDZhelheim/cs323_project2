@@ -1,0 +1,9 @@
+int x(int a)
+{
+  return a;
+}
+
+int testtt()
+{
+  return x(5.0);
+}

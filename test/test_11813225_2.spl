@@ -1,0 +1,12 @@
+struct abcd {
+  int x;
+  char y;
+};
+
+int xx()
+{
+  struct abcd abc;
+  abc.x = -1;
+  abc.y = 'a';
+  return abc.x;
+}

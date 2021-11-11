@@ -1,0 +1,11 @@
+int super_test()
+{
+  int x;
+  undefined(1, 2);
+  1=x;
+}
+
+char super_test()
+{
+  int cui = -1;
+}

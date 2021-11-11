@@ -1,0 +1,10 @@
+int rubbish()
+{
+  int aa;
+  float bb;
+  int aa;
+  if (aa > bb)
+  {
+    return 'v';
+  }
+}

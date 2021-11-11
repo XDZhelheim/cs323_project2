@@ -1,0 +1,3 @@
+Error type 2 at Line 4: a function is invoked without a definition
+Error type 6 at Line 5: rvalue appears on the left-hand side of the assignment operator
+Error type 4 at Line 8: a function is redefined
