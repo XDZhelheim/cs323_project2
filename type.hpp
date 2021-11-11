@@ -34,7 +34,7 @@ public:
 
     Array *array;
 
-    vector<Type> varlist;
+    vector<Type*> varlist;
 
     Type *returnType;
 
@@ -42,7 +42,7 @@ public:
 
     Type(Category _category, string _name = "");
 
-    Type getChild(int lineno);
+    Type* getChild(int lineno);
 
     string getSigniture();
 };
@@ -62,24 +62,24 @@ Type::Type(Category _category, string _name)
     name = _name;
 }
 
-Type Type::getChild(int lineno)
+Type* Type::getChild(int lineno)
 {
 
     if (category == Category::ARRAY)
     {
-        return array->type;
+        return &array->type;
     }
     else
     {
         print_type_10(lineno);
-        return Type(Category::ERROR_VAL);
+        return new Type(Category::ERROR_VAL);
     }
 }
 
 string Type::getSigniture()
 {
     string base = "";
-    Type t = *this;
+    Type* t = this;
     switch (category)
     {
     case Category::INT_VAL:
@@ -95,13 +95,13 @@ string Type::getSigniture()
         return "char";
 
     case Category::ARRAY:
-        while (t.category == Category::ARRAY)
+        while (t->category == Category::ARRAY)
         {
-            t = t.getChild(-1);
+            t = t->getChild(-1);
             base += "*";
         }
 
-        return t.getSigniture() + base;
+        return t->getSigniture() + base;
 
     case Category::STRUCTURE:
         return "struct " + name;
