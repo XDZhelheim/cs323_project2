@@ -667,11 +667,22 @@ public:
                 // Exp LB Exp RB
                 Type *exp1 = analyzeExp(node->child[0]);
                 Type *exp2 = analyzeExp(node->child[2]);
-                if (exp2->getSigniture() != "int")
+                int flag = 0;
+                if (exp1->category != Category::ARRAY)
                 {
                     print_type_10(node->pos);
+                    flag = 1;
+                }
+                if (exp2->getSigniture() != "int")
+                {
+                    print_type_12(node->pos);
+                    flag = 1;
+                }
+                if (flag)
+                {
                     return new Type(Category::ERROR_VAL);
                 }
+                
                 return exp1->getChild(node->pos);
             }
         }

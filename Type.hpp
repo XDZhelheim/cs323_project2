@@ -116,7 +116,7 @@ string Type::getSigniture()
         return "NULL";
     }
 }
-
+#include <iostream>
 Array::Array(Type *_type, int _size)
 {
     type = _type;
