@@ -7,26 +7,28 @@
 #include <map>
 #include <iostream>
 
-using std::map;
 using std::cout;
+using std::map;
 
-map<string, Type*> symbolTable;
+map<string, Type *> symbolTable;
 
 bool isArithmatic(string name)
 {
     return name == "PLUS" || name == "MINUS" || name == "MUL" || name == "DIV";
 }
 
-bool check_func_signature(vector<Type*> &func, vector<Type*> &varList)
+bool check_func_signature(vector<Type *> &func, vector<Type *> &varList)
 {
-    if (DEBUG) cout<<" Check varlist size of func call: "<<func.size()<<" and "<<varList.size()<<endl;
+    if (DEBUG)
+        cout << " Check varlist size of func call: " << func.size() << " and " << varList.size() << endl;
     if (func.size() != varList.size())
     {
         return false;
     }
     for (int i = 0; i < func.size(); i++)
     {
-        if (DEBUG) cout<<"  Compare varlist: "<<func[i]->getSigniture()<<" and "<<varList[i]->getSigniture()<<endl;
+        if (DEBUG)
+            cout << "  Compare varlist: " << func[i]->getSigniture() << " and " << varList[i]->getSigniture() << endl;
         if (func[i]->getSigniture() != varList[i]->getSigniture())
         {
             return false;
@@ -35,7 +37,7 @@ bool check_func_signature(vector<Type*> &func, vector<Type*> &varList)
     return true;
 }
 
-Type* find_structure_mem(vector<Type*> &varList, string name)
+Type *find_structure_mem(vector<Type *> &varList, string name)
 {
     for (auto var : varList)
     {
@@ -70,7 +72,8 @@ public:
     */
     void analyzeProgram(TreeNode *node)
     {
-        if (DEBUG) cout<<"Program"<<endl;
+        if (DEBUG)
+            cout << "Program" << endl;
 
         analyzeExtDefList(node->child[0]);
     }
@@ -82,7 +85,8 @@ public:
     */
     void analyzeExtDefList(TreeNode *node)
     {
-        if (DEBUG) cout<<"ExtDefList"<<endl;
+        if (DEBUG)
+            cout << "ExtDefList" << endl;
 
         if (node->child.empty())
         {
@@ -105,7 +109,8 @@ public:
     */
     void analyzeExtDef(TreeNode *node)
     {
-        if (DEBUG) cout<<"ExtDef"<<endl;
+        if (DEBUG)
+            cout << "ExtDef" << endl;
 
         if (node->child.size() == 2)
         {
@@ -114,7 +119,7 @@ public:
         }
         else
         {
-            Type* specifier = analyzeSpecifier(node->child[0]);
+            Type *specifier = analyzeSpecifier(node->child[0]);
             // TODO check type
             if (node->child[2]->child.empty())
             {
@@ -124,7 +129,7 @@ public:
             else
             {
                 // Specifier FunDec CompSt
-                Type* funcType=new Type(Category::FUNCTION);
+                Type *funcType = new Type(Category::FUNCTION);
                 funcType->returnType = specifier;
                 analyzeFunDec(node->child[1], funcType);
                 analyzeCompSt(node->child[2], funcType);
@@ -137,9 +142,10 @@ public:
       VarDec
     | VarDec COMMA ExtDecList
     */
-    void analyzeExtDecList(TreeNode *node, Type* specifier)
+    void analyzeExtDecList(TreeNode *node, Type *specifier)
     {
-        if (DEBUG) cout<<"ExtDecList"<<endl;
+        if (DEBUG)
+            cout << "ExtDecList" << endl;
 
         analyzeVarDec(node->child[0], specifier);
 
@@ -155,9 +161,10 @@ public:
       TYPE
     | StructSpecifier
     */
-    Type* analyzeSpecifier(TreeNode *node)
+    Type *analyzeSpecifier(TreeNode *node)
     {
-        if (DEBUG) cout<<"Specifier"<<endl;
+        if (DEBUG)
+            cout << "Specifier" << endl;
 
         if (node->child[0]->child.empty())
         {
@@ -189,29 +196,38 @@ public:
       STRUCT ID LC DefList RC
     | STRUCT ID
     */
-    Type* analyzeStructSpecifier(TreeNode *node)
+    Type *analyzeStructSpecifier(TreeNode *node)
     {
-        if (DEBUG) cout<<"StructSpecifier"<<endl;
+        if (DEBUG)
+            cout << "StructSpecifier" << endl;
 
         // TODO symbol table
-        Type* structSpecifier=new Type(Category::STRUCTURE);
-
+        
         TreeNode *id = node->child[1];
-        if (symbolTable.count(id->data) > 0)
-        {
-            print_type_15(id->pos);
-            return structSpecifier;
-        }
-        structSpecifier->name = id->data;
-        symbolTable[id->data] = structSpecifier;
-
         if (node->child.size() == 5)
         {
             // STRUCT ID LC DefList RC
-            analyzeDefList(node->child[3], structSpecifier->varlist);
-        }
+            Type *structSpecifier = new Type(Category::STRUCTURE);
 
-        return structSpecifier;
+            if (symbolTable.count(id->data) > 0)
+            {
+                print_type_15(id->pos);
+                return new Type(Category::ERROR_VAL);
+            }
+            structSpecifier->name = id->data;
+            symbolTable[id->data] = structSpecifier;
+            analyzeDefList(node->child[3], structSpecifier->varlist);
+            return structSpecifier;
+        }
+        else
+        {
+            // if (symbolTable.count(id->data) == 0)
+            // {
+            //     print_type_1(id->pos);
+            //     return new Type(Category::ERROR_VAL);
+            // }
+            return symbolTable[id->data];
+        }
     }
 
     /*
@@ -219,35 +235,35 @@ public:
       ID
     | VarDec LB INT RB
     */
-    void analyzeVarDec(TreeNode *node, Type* specifier)
+    void analyzeVarDec(TreeNode *node, Type *specifier)
     {
-        if (DEBUG) cout<<"VarDec"<<endl;
+        if (DEBUG)
+            cout << "VarDec" << endl;
 
         if (node->child.size() == 1)
         {
             // TODO symbol table
             // ID
             TreeNode *id = node->child[0];
-            if (DEBUG) cout<<"  ID = "<<id->data<<endl;
+            if (DEBUG)
+                cout << "  ID = " << id->data << endl;
 
             if (symbolTable.count(id->data) > 0)
             {
-                if (DEBUG) cout<<id->data<<" has "<<symbolTable.count(id->data)<<" count in symbol table."<<endl;
+                if (DEBUG)
+                    cout << id->data << " has " << symbolTable.count(id->data) << " count in symbol table." << endl;
                 print_type_3(id->pos);
                 return;
             }
-
-            specifier->name = id->data;
-            symbolTable[id->data] = specifier;
+            Type *spec = new Type(*specifier);
+            symbolTable[id->data] = spec;
         }
         else
         {
             // VarDec LB INT RB
             // TODO recursive
-            Type arrSpecifier;
-            Type* parrSpecifier=&arrSpecifier;
-            parrSpecifier->category = Category::ARRAY;
-            parrSpecifier->array = new Array(*specifier, strtol(node->child[2]->data.c_str(), NULL, 0));
+            Type *parrSpecifier = new Type(Category::ARRAY);
+            parrSpecifier->array = new Array(specifier, strtol(node->child[2]->data.c_str(), NULL, 0));
             analyzeVarDec(node->child[0], parrSpecifier);
         }
     }
@@ -257,9 +273,10 @@ public:
       ID LP VarList RP
     | ID LP RP
     */
-    void analyzeFunDec(TreeNode *node, Type* funcType)
+    void analyzeFunDec(TreeNode *node, Type *funcType)
     {
-        if (DEBUG) cout<<"FunDec"<<endl;
+        if (DEBUG)
+            cout << "FunDec" << endl;
 
         // TODO symbol table
 
@@ -269,12 +286,14 @@ public:
             print_type_4(id->pos);
             // return; // @test4
         }
-        else { // @test4 redefine func, keep the first definition
+        else
+        { // @test4 redefine func, keep the first definition
             funcType->name = id->data;
             symbolTable[id->data] = funcType;
         }
 
-        if (DEBUG) cout<<"  Func ID = "<<id->data<<endl;
+        if (DEBUG)
+            cout << "  Func ID = " << id->data << endl;
 
         if (node->child.size() == 4)
         {
@@ -288,9 +307,10 @@ public:
       ParamDec COMMA VarList
     | ParamDec
     */
-    void analyzeVarList(TreeNode *node, vector<Type*> &args)
+    void analyzeVarList(TreeNode *node, vector<Type *> &args)
     {
-        if (DEBUG) cout<<"VarList"<<endl;
+        if (DEBUG)
+            cout << "VarList" << endl;
 
         analyzeParamDec(node->child[0], args);
         if (node->child.size() == 3)
@@ -304,26 +324,29 @@ public:
     ParamDec: 
       Specifier VarDec
     */
-    void analyzeParamDec(TreeNode *node, vector<Type*> &args)
+    void analyzeParamDec(TreeNode *node, vector<Type *> &args)
     {
-        if (DEBUG) cout<<"ParamDec"<<endl;
+        if (DEBUG)
+            cout << "ParamDec" << endl;
 
-        Type* specifier = analyzeSpecifier(node->child[0]);
+        Type *specifier = analyzeSpecifier(node->child[0]);
         analyzeVarDec(node->child[1], specifier);
         args.push_back(specifier);
 
-        if (DEBUG) cout<<"  New args pushed: "<<specifier->category<<endl;
+        if (DEBUG)
+            cout << "  New args pushed: " << specifier->category << endl;
     }
 
     /*
     CompSt: 
       LC DefList StmtList RC
     */
-    void analyzeCompSt(TreeNode *node, Type* funcType)
+    void analyzeCompSt(TreeNode *node, Type *funcType)
     {
-        if (DEBUG) cout<<"Compst"<<endl;
+        if (DEBUG)
+            cout << "Compst" << endl;
 
-        vector<Type*> trash;
+        vector<Type *> trash;
         analyzeDefList(node->child[1], trash);
         analyzeStmtList(node->child[2], funcType);
     }
@@ -333,9 +356,10 @@ public:
       Stmt StmtList
     | %empty
     */
-    void analyzeStmtList(TreeNode *node, Type* funcType)
+    void analyzeStmtList(TreeNode *node, Type *funcType)
     {
-        if (DEBUG) cout<<"StmtList"<<endl;
+        if (DEBUG)
+            cout << "StmtList" << endl;
 
         if (node->child.empty())
         {
@@ -359,9 +383,10 @@ public:
     | IF LP Exp RP Stmt ELSE Stmt
     | WHILE LP Exp RP Stmt
     */
-    void analyzeStmt(TreeNode *node, Type* specifier)
+    void analyzeStmt(TreeNode *node, Type *specifier)
     {
-        if (DEBUG) cout<<"Stmt"<<endl;
+        if (DEBUG)
+            cout << "Stmt" << endl;
 
         if (node->child.size() == 2)
         {
@@ -376,8 +401,9 @@ public:
         else if (node->child.size() == 3)
         {
             // RETURN Exp SEMI
-            Type* exp = analyzeExp(node->child[1]);
-            if (DEBUG) cout<<"Maybe error8, exp = "<<exp->getSigniture()<<", spec = "<<specifier->returnType->getSigniture()<<endl;
+            Type *exp = analyzeExp(node->child[1]);
+            if (DEBUG)
+                cout << "Maybe error8, exp = " << exp->getSigniture() << ", spec = " << specifier->returnType->getSigniture() << endl;
             if (specifier->returnType->getSigniture() != exp->getSigniture())
             {
                 print_type_8(node->pos);
@@ -405,11 +431,12 @@ public:
       Def DefList
     | %empty
     */
-    void analyzeDefList(TreeNode *node, vector<Type*> &varlist)
+    void analyzeDefList(TreeNode *node, vector<Type *> &varlist)
     {
-        if (DEBUG) { 
-            cout<<"DefList"<<endl;
-            cout<<"  DefList childs = "<<node->child.size()<<endl;
+        if (DEBUG)
+        {
+            cout << "DefList" << endl;
+            cout << "  DefList childs = " << node->child.size() << endl;
         }
 
         if (node->child.size() == 2)
@@ -424,11 +451,12 @@ public:
     Def: 
       Specifier DecList SEMI 
     */
-    void analyzeDef(TreeNode *node, vector<Type*> &varlist)
+    void analyzeDef(TreeNode *node, vector<Type *> &varlist)
     {
-        if (DEBUG) cout<<"Def"<<endl;
+        if (DEBUG)
+            cout << "Def" << endl;
 
-        Type* specifier = analyzeSpecifier(node->child[0]);
+        Type *specifier = analyzeSpecifier(node->child[0]);
         analyzeDecList(node->child[1], specifier);
         varlist.push_back(specifier);
     }
@@ -438,9 +466,10 @@ public:
       Dec
     | Dec COMMA DecList
     */
-    void analyzeDecList(TreeNode *node, Type* specifier)
+    void analyzeDecList(TreeNode *node, Type *specifier)
     {
-        if (DEBUG) cout<<"DecList"<<endl;
+        if (DEBUG)
+            cout << "DecList" << endl;
 
         analyzeDec(node->child[0], specifier);
         if (node->child.size() == 3)
@@ -455,9 +484,10 @@ public:
       VarDec
     | VarDec ASSIGN Exp
     */
-    void analyzeDec(TreeNode *node, Type* specifier)
+    void analyzeDec(TreeNode *node, Type *specifier)
     {
-        if(DEBUG) cout<<"Dec"<<endl;
+        if (DEBUG)
+            cout << "Dec" << endl;
 
         // TODO symbol table
         analyzeVarDec(node->child[0], specifier);
@@ -496,11 +526,12 @@ public:
     | FLOAT
     | CHAR
     */
-    Type* analyzeExp(TreeNode *node)
+    Type *analyzeExp(TreeNode *node)
     {
-        if (DEBUG) {
-            cout<<"Exp"<<endl;
-            cout<<"  Exp childs = "<<node->child.size()<<endl;
+        if (DEBUG)
+        {
+            cout << "Exp" << endl;
+            cout << "  Exp childs = " << node->child.size() << endl;
         }
 
         if (node->child.size() == 3)
@@ -514,7 +545,7 @@ public:
                     print_type_2(node->pos);
                     return new Type(Category::ERROR_VAL);
                 }
-                Type* exp = symbolTable[node->child[0]->data];
+                Type *exp = symbolTable[node->child[0]->data];
                 if (exp->category != Category::FUNCTION)
                 {
                     print_type_11(node->pos);
@@ -535,13 +566,14 @@ public:
             else if (!node->child[0]->child.empty() && node->child[1]->child.empty() && node->child[2]->child.empty())
             {
                 // Exp DOT ID
-                Type* exp = analyzeExp(node->child[0]);
+                Type *exp = analyzeExp(node->child[0]);
+                std::cout << exp->varlist[0]->category << std::endl;
                 if (exp->category != Category::STRUCTURE)
                 {
                     print_type_13(node->pos);
                     return new Type(ERROR_VAL);
                 }
-                Type* t = find_structure_mem(exp->varlist, node->child[2]->data);
+                Type *t = find_structure_mem(exp->varlist, node->child[2]->data);
                 if (t->category == Category::ERROR_VAL)
                 {
                     print_type_14(node->pos);
@@ -552,8 +584,8 @@ public:
             else
             {
                 // Exp op Exp
-                Type* exp1 = analyzeExp(node->child[0]);
-                Type* exp2 = analyzeExp(node->child[2]);
+                Type *exp1 = analyzeExp(node->child[0]);
+                Type *exp2 = analyzeExp(node->child[2]);
                 if (exp1->getSigniture() != exp2->getSigniture() || exp1->category == Category::ERROR_VAL)
                 {
                     if (node->child[1]->name == "ASSIGN")
@@ -562,13 +594,14 @@ public:
                     }
                     else
                     {
-                        if (DEBUG) cout<<"Maybe error7, exp1 = "<<exp1->getSigniture()<<", exp2 = "<<exp2->getSigniture()<<endl;
+                        if (DEBUG)
+                            cout << "Maybe error7, exp1 = " << exp1->getSigniture() << ", exp2 = " << exp2->getSigniture() << endl;
                         if (exp1->category != Category::ERROR_VAL && exp2->category != Category::ERROR_VAL)
                             print_type_7(node->pos);
                     }
                     return new Type(Category::ERROR_VAL);
                 }
-                if (node -> child[1]->name == "ASSIGN" && (exp1->category == Category::INT_VAL || exp1->category == Category::FLOAT_VAL || exp1->category == CHAR_VAR))
+                if (node->child[1]->name == "ASSIGN" && (exp1->category == Category::INT_VAL || exp1->category == Category::FLOAT_VAL || exp1->category == CHAR_VAR))
                 {
                     print_type_6(node->pos);
                     return new Type(Category::ERROR_VAL);
@@ -589,14 +622,14 @@ public:
             if (node->child[0]->child.empty())
             {
                 // ID LP Args RP
-                vector<Type*> varList;
+                vector<Type *> varList;
                 analyzeArgs(node->child[2], varList);
                 if (!symbolTable.count(node->child[0]->data))
                 {
                     print_type_2(node->pos);
                     return new Type(Category::ERROR_VAL);
                 }
-                Type* exp = symbolTable[node->child[0]->data];
+                Type *exp = symbolTable[node->child[0]->data];
                 if (exp->category != Category::FUNCTION)
                 {
                     print_type_11(node->pos);
@@ -612,8 +645,8 @@ public:
             else
             {
                 // Exp LB Exp RB
-                Type* exp1 = analyzeExp(node->child[0]);
-                Type* exp2 = analyzeExp(node->child[2]);
+                Type *exp1 = analyzeExp(node->child[0]);
+                Type *exp2 = analyzeExp(node->child[2]);
                 if (exp2->getSigniture() != "int")
                 {
                     print_type_10(node->pos);
@@ -639,7 +672,7 @@ public:
             default:
                 if (symbolTable.count(node->child[0]->data))
                 {
-                    Type* t = symbolTable[node->child[0]->data];
+                    Type *t = symbolTable[node->child[0]->data];
                     if (t->category == Category::STRUCTURE && node->child[0]->data == t->name)
                     {
                         return new Type(Category::ERROR_VAL);
@@ -657,9 +690,10 @@ public:
       Exp COMMA Args
     | Exp
     */
-    void analyzeArgs(TreeNode *node, vector<Type*> &varList)
+    void analyzeArgs(TreeNode *node, vector<Type *> &varList)
     {
-        if (DEBUG) cout<<"Args"<<endl;
+        if (DEBUG)
+            cout << "Args" << endl;
 
         varList.push_back(analyzeExp(node->child[0]));
         if (node->child.size() == 3)

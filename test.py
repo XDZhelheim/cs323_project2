@@ -8,6 +8,8 @@ if __name__ == "__main__":
     for file in os.listdir("./test-self/"):
         if file.endswith(".spl"):
             os.system("./bin/splc ./test-self/{}".format(file))
+    
+    os.system("make clean")
             
     for out_file in os.listdir("./test-self/"):
         if out_file.endswith(".out"):

@@ -34,7 +34,9 @@ public:
 
     Array *array;
 
-    vector<Type*> varlist;
+    vector<Type *> varlist;
+
+    Type *structType;
 
     Type *returnType;
 
@@ -42,7 +44,7 @@ public:
 
     Type(Category _category, string _name = "");
 
-    Type* getChild(int lineno);
+    Type *getChild(int lineno);
 
     string getSigniture();
 };
@@ -50,10 +52,10 @@ public:
 class Array
 {
 public:
-    Type type;
+    Type *type;
     int size;
 
-    Array(Type _type, int _size);
+    Array(Type *_type, int _size);
 };
 
 Type::Type(Category _category, string _name)
@@ -62,12 +64,12 @@ Type::Type(Category _category, string _name)
     name = _name;
 }
 
-Type* Type::getChild(int lineno)
+Type *Type::getChild(int lineno)
 {
 
     if (category == Category::ARRAY)
     {
-        return &array->type;
+        return array->type;
     }
     else
     {
@@ -79,7 +81,7 @@ Type* Type::getChild(int lineno)
 string Type::getSigniture()
 {
     string base = "";
-    Type* t = this;
+    Type *t = this;
     switch (category)
     {
     case Category::INT_VAL:
@@ -114,7 +116,7 @@ string Type::getSigniture()
     }
 }
 
-Array::Array(Type _type, int _size)
+Array::Array(Type *_type, int _size)
 {
     type = _type;
     size = _size;
