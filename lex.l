@@ -37,8 +37,8 @@ return          { yylval = create_node("RETURN", yylloc.first_line); return RETU
 
 {letter_}({letter_}|{digit})*           { yylval = create_node("ID", yylloc.first_line, DataType::ID_TYPE, yytext); return ID; }
 
-"."     { yylval = create_node("DOT",yylloc.first_line); return DOT; }
-";"     { yylval = create_node("SEMI",yylloc.first_line); return SEMI; }
+"."     { yylval = create_node("DOT", yylloc.first_line); return DOT; }
+";"     { yylval = create_node("SEMI", yylloc.first_line); return SEMI; }
 ","     { yylval = create_node("COMMA", yylloc.first_line); return COMMA; }
 "="     { yylval = create_node("ASSIGN", yylloc.first_line); return ASSIGN; }
 "<"     { yylval = create_node("LT", yylloc.first_line); return LT; }

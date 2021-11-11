@@ -1,2 +1,1 @@
-# cs323_project2
-CS323 Project 2
+# CS323 Project2 Report
